@@ -1,27 +1,46 @@
-# Mechtek
+# MEK-SEL ERP
 
-enable lovable cloud with metchtech project
-nothing you have to do
-just enable 
-we will code then
+Enquiry-to-dispatch ERP for **Mechtek, Bengaluru** (blister packing machines, de-foiling machines and change parts),
+built by **Selvantra Technologies**. This repository replaces the earlier SalonBook app.
 
-This project was built with [Lovable](https://lovable.dev).
+This project was built with [Lovable](https://lovable.dev) (TanStack Start + React + Lovable Cloud).
 
-## Build with Lovable
+## Status
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/f500f6c4-18dd-4294-82fc-9d7f87ba06ef).
+Phase 1 is the **front end**: every screen of the MEK-SEL ERP prototype, rebuilt as React pages, running on in-memory
+sample data. Phase 2 moves the data into the Lovable Cloud (Supabase) database.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+| Batch | Screens | Status |
+| --- | --- | --- |
+| 1 | Login, app shell, Dashboard, Leads, CRM desk, Customers, Quotations (with combo sets), Sales orders, Dispatch from order, Invoices | Done |
+| 2 | Product master, Combo sets, Bill of materials, Raw materials, Demand forecast, Material planning, Work orders, Dispatch | Done |
+| 3 | Purchase overview, Vendors, Indents, Purchase orders, Gate pass, GRN, Vendor bills, Stores desk, Inventory, Procurement planning, Material requisition | Done |
+| 4 | Receivables, Payables, Installed base & service, Staff master, Role master, Help, search on every screen and "Search everything" (Ctrl+K) | Done |
+
+## Demo sign-in
+
+Pick any demo account on the login screen. Administrator: `admin` / `mechtek@2026`.
+Each role sees only the modules it is allowed (Role master), and approvals follow the role's approval rights.
+
+## Code map
+
+- `src/erp/engine.ts` — sample data and business rules (orders, GST invoices, MRP, stores, CRM). Each collection becomes a table in phase 2.
+- `src/erp/session.ts` — signed-in user, role permissions (`canSee`, `canEdit`, `canApprove`), per-screen UI state.
+- `src/erp/nav.ts` — sidebar menu and counters. `src/erp/help.ts` — "How to use this page" guides; `src/erp/guides.ts` — Help screen guides.
+- `src/erp/forecast.ts` — demand forecast methods, backtest and forecast-driven material requirement.
+- `src/components/erp/` — app shell, shared UI (`ui.tsx`), smart search (`Search.tsx`), and the screens under `pages/`
+  (sales pages, `Engineering`, `Operations`, `Forecast`, `Purchase`, `Stores`, `Finance`, `Admin`, `Help`; shared purchase/stores pieces in `proc.tsx`).
+- `src/routes/_erp/*.tsx` — one route per screen (`/dashboard`, `/quotes`, …). `src/routes/login.tsx` — sign-in.
+- `src/styles.css` — Mechtek brand theme (orange `#FD9700`, charcoal `#333333`, Montserrat + Open Sans), light and dark.
+
+## Database note
+
+The Lovable Cloud database still contains the old SalonBook tables (`supabase/migrations`). They are not used by
+MEK-SEL ERP and will be dropped when the MEK-SEL tables are created in phase 2.
 
 ## Development
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
-
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
 npm i
 npm run dev
 ```

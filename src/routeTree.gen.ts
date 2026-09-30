@@ -10,33 +10,482 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ErpRouteRouteImport } from './routes/_erp/route'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ErpBillsRouteImport } from './routes/_erp/bills'
+import { Route as ErpBomRouteImport } from './routes/_erp/bom'
+import { Route as ErpCombosRouteImport } from './routes/_erp/combos'
+import { Route as ErpCrmRouteImport } from './routes/_erp/crm'
+import { Route as ErpCustomersRouteImport } from './routes/_erp/customers'
+import { Route as ErpDashboardRouteImport } from './routes/_erp/dashboard'
+import { Route as ErpDispatchRouteImport } from './routes/_erp/dispatch'
+import { Route as ErpForecastRouteImport } from './routes/_erp/forecast'
+import { Route as ErpGateRouteImport } from './routes/_erp/gate'
+import { Route as ErpGrnRouteImport } from './routes/_erp/grn'
+import { Route as ErpHelpRouteImport } from './routes/_erp/help'
+import { Route as ErpIndentRouteImport } from './routes/_erp/indent'
+import { Route as ErpInventoryRouteImport } from './routes/_erp/inventory'
+import { Route as ErpInvoicesRouteImport } from './routes/_erp/invoices'
+import { Route as ErpLeadsRouteImport } from './routes/_erp/leads'
+import { Route as ErpMaterialsRouteImport } from './routes/_erp/materials'
+import { Route as ErpMrRouteImport } from './routes/_erp/mr'
+import { Route as ErpMrpRouteImport } from './routes/_erp/mrp'
+import { Route as ErpOrdersRouteImport } from './routes/_erp/orders'
+import { Route as ErpPayablesRouteImport } from './routes/_erp/payables'
+import { Route as ErpPlanningRouteImport } from './routes/_erp/planning'
+import { Route as ErpPoRouteImport } from './routes/_erp/po'
+import { Route as ErpProductsRouteImport } from './routes/_erp/products'
+import { Route as ErpPurchaseRouteImport } from './routes/_erp/purchase'
+import { Route as ErpQuotesRouteImport } from './routes/_erp/quotes'
+import { Route as ErpReceivablesRouteImport } from './routes/_erp/receivables'
+import { Route as ErpRolesRouteImport } from './routes/_erp/roles'
+import { Route as ErpServiceRouteImport } from './routes/_erp/service'
+import { Route as ErpStaffRouteImport } from './routes/_erp/staff'
+import { Route as ErpStoresRouteImport } from './routes/_erp/stores'
+import { Route as ErpVendorsRouteImport } from './routes/_erp/vendors'
+import { Route as ErpWorkordersRouteImport } from './routes/_erp/workorders'
+import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ErpRouteRoute = ErpRouteRouteImport.update({
+  id: '/_erp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ErpBillsRoute = ErpBillsRouteImport.update({
+  id: '/bills',
+  path: '/bills',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpBomRoute = ErpBomRouteImport.update({
+  id: '/bom',
+  path: '/bom',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpCombosRoute = ErpCombosRouteImport.update({
+  id: '/combos',
+  path: '/combos',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpCrmRoute = ErpCrmRouteImport.update({
+  id: '/crm',
+  path: '/crm',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpCustomersRoute = ErpCustomersRouteImport.update({
+  id: '/customers',
+  path: '/customers',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpDashboardRoute = ErpDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpDispatchRoute = ErpDispatchRouteImport.update({
+  id: '/dispatch',
+  path: '/dispatch',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpForecastRoute = ErpForecastRouteImport.update({
+  id: '/forecast',
+  path: '/forecast',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpGateRoute = ErpGateRouteImport.update({
+  id: '/gate',
+  path: '/gate',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpGrnRoute = ErpGrnRouteImport.update({
+  id: '/grn',
+  path: '/grn',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpHelpRoute = ErpHelpRouteImport.update({
+  id: '/help',
+  path: '/help',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpIndentRoute = ErpIndentRouteImport.update({
+  id: '/indent',
+  path: '/indent',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpInventoryRoute = ErpInventoryRouteImport.update({
+  id: '/inventory',
+  path: '/inventory',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpInvoicesRoute = ErpInvoicesRouteImport.update({
+  id: '/invoices',
+  path: '/invoices',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpLeadsRoute = ErpLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpMaterialsRoute = ErpMaterialsRouteImport.update({
+  id: '/materials',
+  path: '/materials',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpMrRoute = ErpMrRouteImport.update({
+  id: '/mr',
+  path: '/mr',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpMrpRoute = ErpMrpRouteImport.update({
+  id: '/mrp',
+  path: '/mrp',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpOrdersRoute = ErpOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpPayablesRoute = ErpPayablesRouteImport.update({
+  id: '/payables',
+  path: '/payables',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpPlanningRoute = ErpPlanningRouteImport.update({
+  id: '/planning',
+  path: '/planning',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpPoRoute = ErpPoRouteImport.update({
+  id: '/po',
+  path: '/po',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpProductsRoute = ErpProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpPurchaseRoute = ErpPurchaseRouteImport.update({
+  id: '/purchase',
+  path: '/purchase',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpQuotesRoute = ErpQuotesRouteImport.update({
+  id: '/quotes',
+  path: '/quotes',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpReceivablesRoute = ErpReceivablesRouteImport.update({
+  id: '/receivables',
+  path: '/receivables',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpRolesRoute = ErpRolesRouteImport.update({
+  id: '/roles',
+  path: '/roles',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpServiceRoute = ErpServiceRouteImport.update({
+  id: '/service',
+  path: '/service',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpStaffRoute = ErpStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpStoresRoute = ErpStoresRouteImport.update({
+  id: '/stores',
+  path: '/stores',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpVendorsRoute = ErpVendorsRouteImport.update({
+  id: '/vendors',
+  path: '/vendors',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpWorkordersRoute = ErpWorkordersRouteImport.update({
+  id: '/workorders',
+  path: '/workorders',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
+  id: '/lovable/email/auth/preview',
+  path: '/lovable/email/auth/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailAuthWebhookRoute = LovableEmailAuthWebhookRouteImport.update({
+  id: '/lovable/email/auth/webhook',
+  path: '/lovable/email/auth/webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/bills': typeof ErpBillsRoute
+  '/bom': typeof ErpBomRoute
+  '/combos': typeof ErpCombosRoute
+  '/crm': typeof ErpCrmRoute
+  '/customers': typeof ErpCustomersRoute
+  '/dashboard': typeof ErpDashboardRoute
+  '/dispatch': typeof ErpDispatchRoute
+  '/forecast': typeof ErpForecastRoute
+  '/gate': typeof ErpGateRoute
+  '/grn': typeof ErpGrnRoute
+  '/help': typeof ErpHelpRoute
+  '/indent': typeof ErpIndentRoute
+  '/inventory': typeof ErpInventoryRoute
+  '/invoices': typeof ErpInvoicesRoute
+  '/leads': typeof ErpLeadsRoute
+  '/materials': typeof ErpMaterialsRoute
+  '/mr': typeof ErpMrRoute
+  '/mrp': typeof ErpMrpRoute
+  '/orders': typeof ErpOrdersRoute
+  '/payables': typeof ErpPayablesRoute
+  '/planning': typeof ErpPlanningRoute
+  '/po': typeof ErpPoRoute
+  '/products': typeof ErpProductsRoute
+  '/purchase': typeof ErpPurchaseRoute
+  '/quotes': typeof ErpQuotesRoute
+  '/receivables': typeof ErpReceivablesRoute
+  '/roles': typeof ErpRolesRoute
+  '/service': typeof ErpServiceRoute
+  '/staff': typeof ErpStaffRoute
+  '/stores': typeof ErpStoresRoute
+  '/vendors': typeof ErpVendorsRoute
+  '/workorders': typeof ErpWorkordersRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/login': typeof LoginRoute
+  '/bills': typeof ErpBillsRoute
+  '/bom': typeof ErpBomRoute
+  '/combos': typeof ErpCombosRoute
+  '/crm': typeof ErpCrmRoute
+  '/customers': typeof ErpCustomersRoute
+  '/dashboard': typeof ErpDashboardRoute
+  '/dispatch': typeof ErpDispatchRoute
+  '/forecast': typeof ErpForecastRoute
+  '/gate': typeof ErpGateRoute
+  '/grn': typeof ErpGrnRoute
+  '/help': typeof ErpHelpRoute
+  '/indent': typeof ErpIndentRoute
+  '/inventory': typeof ErpInventoryRoute
+  '/invoices': typeof ErpInvoicesRoute
+  '/leads': typeof ErpLeadsRoute
+  '/materials': typeof ErpMaterialsRoute
+  '/mr': typeof ErpMrRoute
+  '/mrp': typeof ErpMrpRoute
+  '/orders': typeof ErpOrdersRoute
+  '/payables': typeof ErpPayablesRoute
+  '/planning': typeof ErpPlanningRoute
+  '/po': typeof ErpPoRoute
+  '/products': typeof ErpProductsRoute
+  '/purchase': typeof ErpPurchaseRoute
+  '/quotes': typeof ErpQuotesRoute
+  '/receivables': typeof ErpReceivablesRoute
+  '/roles': typeof ErpRolesRoute
+  '/service': typeof ErpServiceRoute
+  '/staff': typeof ErpStaffRoute
+  '/stores': typeof ErpStoresRoute
+  '/vendors': typeof ErpVendorsRoute
+  '/workorders': typeof ErpWorkordersRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_erp': typeof ErpRouteRouteWithChildren
+  '/login': typeof LoginRoute
+  '/_erp/bills': typeof ErpBillsRoute
+  '/_erp/bom': typeof ErpBomRoute
+  '/_erp/combos': typeof ErpCombosRoute
+  '/_erp/crm': typeof ErpCrmRoute
+  '/_erp/customers': typeof ErpCustomersRoute
+  '/_erp/dashboard': typeof ErpDashboardRoute
+  '/_erp/dispatch': typeof ErpDispatchRoute
+  '/_erp/forecast': typeof ErpForecastRoute
+  '/_erp/gate': typeof ErpGateRoute
+  '/_erp/grn': typeof ErpGrnRoute
+  '/_erp/help': typeof ErpHelpRoute
+  '/_erp/indent': typeof ErpIndentRoute
+  '/_erp/inventory': typeof ErpInventoryRoute
+  '/_erp/invoices': typeof ErpInvoicesRoute
+  '/_erp/leads': typeof ErpLeadsRoute
+  '/_erp/materials': typeof ErpMaterialsRoute
+  '/_erp/mr': typeof ErpMrRoute
+  '/_erp/mrp': typeof ErpMrpRoute
+  '/_erp/orders': typeof ErpOrdersRoute
+  '/_erp/payables': typeof ErpPayablesRoute
+  '/_erp/planning': typeof ErpPlanningRoute
+  '/_erp/po': typeof ErpPoRoute
+  '/_erp/products': typeof ErpProductsRoute
+  '/_erp/purchase': typeof ErpPurchaseRoute
+  '/_erp/quotes': typeof ErpQuotesRoute
+  '/_erp/receivables': typeof ErpReceivablesRoute
+  '/_erp/roles': typeof ErpRolesRoute
+  '/_erp/service': typeof ErpServiceRoute
+  '/_erp/staff': typeof ErpStaffRoute
+  '/_erp/stores': typeof ErpStoresRoute
+  '/_erp/vendors': typeof ErpVendorsRoute
+  '/_erp/workorders': typeof ErpWorkordersRoute
+  '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
+  '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/bills'
+    | '/bom'
+    | '/combos'
+    | '/crm'
+    | '/customers'
+    | '/dashboard'
+    | '/dispatch'
+    | '/forecast'
+    | '/gate'
+    | '/grn'
+    | '/help'
+    | '/indent'
+    | '/inventory'
+    | '/invoices'
+    | '/leads'
+    | '/materials'
+    | '/mr'
+    | '/mrp'
+    | '/orders'
+    | '/payables'
+    | '/planning'
+    | '/po'
+    | '/products'
+    | '/purchase'
+    | '/quotes'
+    | '/receivables'
+    | '/roles'
+    | '/service'
+    | '/staff'
+    | '/stores'
+    | '/vendors'
+    | '/workorders'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/login'
+    | '/bills'
+    | '/bom'
+    | '/combos'
+    | '/crm'
+    | '/customers'
+    | '/dashboard'
+    | '/dispatch'
+    | '/forecast'
+    | '/gate'
+    | '/grn'
+    | '/help'
+    | '/indent'
+    | '/inventory'
+    | '/invoices'
+    | '/leads'
+    | '/materials'
+    | '/mr'
+    | '/mrp'
+    | '/orders'
+    | '/payables'
+    | '/planning'
+    | '/po'
+    | '/products'
+    | '/purchase'
+    | '/quotes'
+    | '/receivables'
+    | '/roles'
+    | '/service'
+    | '/staff'
+    | '/stores'
+    | '/vendors'
+    | '/workorders'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
+  id:
+    | '__root__'
+    | '/'
+    | '/_erp'
+    | '/login'
+    | '/_erp/bills'
+    | '/_erp/bom'
+    | '/_erp/combos'
+    | '/_erp/crm'
+    | '/_erp/customers'
+    | '/_erp/dashboard'
+    | '/_erp/dispatch'
+    | '/_erp/forecast'
+    | '/_erp/gate'
+    | '/_erp/grn'
+    | '/_erp/help'
+    | '/_erp/indent'
+    | '/_erp/inventory'
+    | '/_erp/invoices'
+    | '/_erp/leads'
+    | '/_erp/materials'
+    | '/_erp/mr'
+    | '/_erp/mrp'
+    | '/_erp/orders'
+    | '/_erp/payables'
+    | '/_erp/planning'
+    | '/_erp/po'
+    | '/_erp/products'
+    | '/_erp/purchase'
+    | '/_erp/quotes'
+    | '/_erp/receivables'
+    | '/_erp/roles'
+    | '/_erp/service'
+    | '/_erp/staff'
+    | '/_erp/stores'
+    | '/_erp/vendors'
+    | '/_erp/workorders'
+    | '/lovable/email/auth/preview'
+    | '/lovable/email/auth/webhook'
+    | '/lovable/email/transactional/preview'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ErpRouteRoute: typeof ErpRouteRouteWithChildren
+  LoginRoute: typeof LoginRoute
+  LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
+  LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +497,349 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_erp': {
+      id: '/_erp'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ErpRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_erp/bills': {
+      id: '/_erp/bills'
+      path: '/bills'
+      fullPath: '/bills'
+      preLoaderRoute: typeof ErpBillsRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/bom': {
+      id: '/_erp/bom'
+      path: '/bom'
+      fullPath: '/bom'
+      preLoaderRoute: typeof ErpBomRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/combos': {
+      id: '/_erp/combos'
+      path: '/combos'
+      fullPath: '/combos'
+      preLoaderRoute: typeof ErpCombosRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/crm': {
+      id: '/_erp/crm'
+      path: '/crm'
+      fullPath: '/crm'
+      preLoaderRoute: typeof ErpCrmRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/customers': {
+      id: '/_erp/customers'
+      path: '/customers'
+      fullPath: '/customers'
+      preLoaderRoute: typeof ErpCustomersRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/dashboard': {
+      id: '/_erp/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ErpDashboardRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/dispatch': {
+      id: '/_erp/dispatch'
+      path: '/dispatch'
+      fullPath: '/dispatch'
+      preLoaderRoute: typeof ErpDispatchRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/forecast': {
+      id: '/_erp/forecast'
+      path: '/forecast'
+      fullPath: '/forecast'
+      preLoaderRoute: typeof ErpForecastRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/gate': {
+      id: '/_erp/gate'
+      path: '/gate'
+      fullPath: '/gate'
+      preLoaderRoute: typeof ErpGateRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/grn': {
+      id: '/_erp/grn'
+      path: '/grn'
+      fullPath: '/grn'
+      preLoaderRoute: typeof ErpGrnRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/help': {
+      id: '/_erp/help'
+      path: '/help'
+      fullPath: '/help'
+      preLoaderRoute: typeof ErpHelpRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/indent': {
+      id: '/_erp/indent'
+      path: '/indent'
+      fullPath: '/indent'
+      preLoaderRoute: typeof ErpIndentRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/inventory': {
+      id: '/_erp/inventory'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof ErpInventoryRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/invoices': {
+      id: '/_erp/invoices'
+      path: '/invoices'
+      fullPath: '/invoices'
+      preLoaderRoute: typeof ErpInvoicesRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/leads': {
+      id: '/_erp/leads'
+      path: '/leads'
+      fullPath: '/leads'
+      preLoaderRoute: typeof ErpLeadsRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/materials': {
+      id: '/_erp/materials'
+      path: '/materials'
+      fullPath: '/materials'
+      preLoaderRoute: typeof ErpMaterialsRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/mr': {
+      id: '/_erp/mr'
+      path: '/mr'
+      fullPath: '/mr'
+      preLoaderRoute: typeof ErpMrRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/mrp': {
+      id: '/_erp/mrp'
+      path: '/mrp'
+      fullPath: '/mrp'
+      preLoaderRoute: typeof ErpMrpRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/orders': {
+      id: '/_erp/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof ErpOrdersRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/payables': {
+      id: '/_erp/payables'
+      path: '/payables'
+      fullPath: '/payables'
+      preLoaderRoute: typeof ErpPayablesRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/planning': {
+      id: '/_erp/planning'
+      path: '/planning'
+      fullPath: '/planning'
+      preLoaderRoute: typeof ErpPlanningRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/po': {
+      id: '/_erp/po'
+      path: '/po'
+      fullPath: '/po'
+      preLoaderRoute: typeof ErpPoRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/products': {
+      id: '/_erp/products'
+      path: '/products'
+      fullPath: '/products'
+      preLoaderRoute: typeof ErpProductsRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/purchase': {
+      id: '/_erp/purchase'
+      path: '/purchase'
+      fullPath: '/purchase'
+      preLoaderRoute: typeof ErpPurchaseRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/quotes': {
+      id: '/_erp/quotes'
+      path: '/quotes'
+      fullPath: '/quotes'
+      preLoaderRoute: typeof ErpQuotesRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/receivables': {
+      id: '/_erp/receivables'
+      path: '/receivables'
+      fullPath: '/receivables'
+      preLoaderRoute: typeof ErpReceivablesRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/roles': {
+      id: '/_erp/roles'
+      path: '/roles'
+      fullPath: '/roles'
+      preLoaderRoute: typeof ErpRolesRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/service': {
+      id: '/_erp/service'
+      path: '/service'
+      fullPath: '/service'
+      preLoaderRoute: typeof ErpServiceRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/staff': {
+      id: '/_erp/staff'
+      path: '/staff'
+      fullPath: '/staff'
+      preLoaderRoute: typeof ErpStaffRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/stores': {
+      id: '/_erp/stores'
+      path: '/stores'
+      fullPath: '/stores'
+      preLoaderRoute: typeof ErpStoresRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/vendors': {
+      id: '/_erp/vendors'
+      path: '/vendors'
+      fullPath: '/vendors'
+      preLoaderRoute: typeof ErpVendorsRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/workorders': {
+      id: '/_erp/workorders'
+      path: '/workorders'
+      fullPath: '/workorders'
+      preLoaderRoute: typeof ErpWorkordersRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/lovable/email/auth/preview': {
+      id: '/lovable/email/auth/preview'
+      path: '/lovable/email/auth/preview'
+      fullPath: '/lovable/email/auth/preview'
+      preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/auth/webhook': {
+      id: '/lovable/email/auth/webhook'
+      path: '/lovable/email/auth/webhook'
+      fullPath: '/lovable/email/auth/webhook'
+      preLoaderRoute: typeof LovableEmailAuthWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
+interface ErpRouteRouteChildren {
+  ErpBillsRoute: typeof ErpBillsRoute
+  ErpBomRoute: typeof ErpBomRoute
+  ErpCombosRoute: typeof ErpCombosRoute
+  ErpCrmRoute: typeof ErpCrmRoute
+  ErpCustomersRoute: typeof ErpCustomersRoute
+  ErpDashboardRoute: typeof ErpDashboardRoute
+  ErpDispatchRoute: typeof ErpDispatchRoute
+  ErpForecastRoute: typeof ErpForecastRoute
+  ErpGateRoute: typeof ErpGateRoute
+  ErpGrnRoute: typeof ErpGrnRoute
+  ErpHelpRoute: typeof ErpHelpRoute
+  ErpIndentRoute: typeof ErpIndentRoute
+  ErpInventoryRoute: typeof ErpInventoryRoute
+  ErpInvoicesRoute: typeof ErpInvoicesRoute
+  ErpLeadsRoute: typeof ErpLeadsRoute
+  ErpMaterialsRoute: typeof ErpMaterialsRoute
+  ErpMrRoute: typeof ErpMrRoute
+  ErpMrpRoute: typeof ErpMrpRoute
+  ErpOrdersRoute: typeof ErpOrdersRoute
+  ErpPayablesRoute: typeof ErpPayablesRoute
+  ErpPlanningRoute: typeof ErpPlanningRoute
+  ErpPoRoute: typeof ErpPoRoute
+  ErpProductsRoute: typeof ErpProductsRoute
+  ErpPurchaseRoute: typeof ErpPurchaseRoute
+  ErpQuotesRoute: typeof ErpQuotesRoute
+  ErpReceivablesRoute: typeof ErpReceivablesRoute
+  ErpRolesRoute: typeof ErpRolesRoute
+  ErpServiceRoute: typeof ErpServiceRoute
+  ErpStaffRoute: typeof ErpStaffRoute
+  ErpStoresRoute: typeof ErpStoresRoute
+  ErpVendorsRoute: typeof ErpVendorsRoute
+  ErpWorkordersRoute: typeof ErpWorkordersRoute
+}
+
+const ErpRouteRouteChildren: ErpRouteRouteChildren = {
+  ErpBillsRoute: ErpBillsRoute,
+  ErpBomRoute: ErpBomRoute,
+  ErpCombosRoute: ErpCombosRoute,
+  ErpCrmRoute: ErpCrmRoute,
+  ErpCustomersRoute: ErpCustomersRoute,
+  ErpDashboardRoute: ErpDashboardRoute,
+  ErpDispatchRoute: ErpDispatchRoute,
+  ErpForecastRoute: ErpForecastRoute,
+  ErpGateRoute: ErpGateRoute,
+  ErpGrnRoute: ErpGrnRoute,
+  ErpHelpRoute: ErpHelpRoute,
+  ErpIndentRoute: ErpIndentRoute,
+  ErpInventoryRoute: ErpInventoryRoute,
+  ErpInvoicesRoute: ErpInvoicesRoute,
+  ErpLeadsRoute: ErpLeadsRoute,
+  ErpMaterialsRoute: ErpMaterialsRoute,
+  ErpMrRoute: ErpMrRoute,
+  ErpMrpRoute: ErpMrpRoute,
+  ErpOrdersRoute: ErpOrdersRoute,
+  ErpPayablesRoute: ErpPayablesRoute,
+  ErpPlanningRoute: ErpPlanningRoute,
+  ErpPoRoute: ErpPoRoute,
+  ErpProductsRoute: ErpProductsRoute,
+  ErpPurchaseRoute: ErpPurchaseRoute,
+  ErpQuotesRoute: ErpQuotesRoute,
+  ErpReceivablesRoute: ErpReceivablesRoute,
+  ErpRolesRoute: ErpRolesRoute,
+  ErpServiceRoute: ErpServiceRoute,
+  ErpStaffRoute: ErpStaffRoute,
+  ErpStoresRoute: ErpStoresRoute,
+  ErpVendorsRoute: ErpVendorsRoute,
+  ErpWorkordersRoute: ErpWorkordersRoute,
+}
+
+const ErpRouteRouteWithChildren = ErpRouteRoute._addFileChildren(
+  ErpRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ErpRouteRoute: ErpRouteRouteWithChildren,
+  LoginRoute: LoginRoute,
+  LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
+  LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
