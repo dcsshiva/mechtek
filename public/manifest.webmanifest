@@ -1,0 +1,13 @@
+{
+  "name": "MEK-SEL ERP — Mechtek",
+  "short_name": "MEK-SEL ERP",
+  "description": "Enquiry-to-dispatch ERP for Mechtek, Bengaluru. Built by Selvantra Technologies.",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F4F2EF",
+  "theme_color": "#FD9700",
+  "icons": [
+    { "src": "/mechtek-logo.png", "sizes": "118x106", "type": "image/png" }
+  ]
+}
