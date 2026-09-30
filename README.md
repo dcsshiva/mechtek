@@ -7,8 +7,8 @@ This project was built with [Lovable](https://lovable.dev) (TanStack Start + Rea
 
 ## Status
 
-Phase 1 is the **front end**: every screen of the MEK-SEL ERP prototype, rebuilt as React pages, running on in-memory
-sample data. Phase 2 moves the data into the Lovable Cloud (Supabase) database.
+Phase 1 is the **front end**: every screen of the MEK-SEL ERP prototype, rebuilt as React pages.
+Phase 2 stores the data in Lovable Cloud (Supabase), so it survives a reload and is shared by everyone using the app.
 
 | Batch | Screens | Status |
 | --- | --- | --- |
@@ -33,10 +33,24 @@ Each role sees only the modules it is allowed (Role master), and approvals follo
 - `src/routes/_erp/*.tsx` — one route per screen (`/dashboard`, `/quotes`, …). `src/routes/login.tsx` — sign-in.
 - `src/styles.css` — Mechtek brand theme (orange `#FD9700`, charcoal `#333333`, Montserrat + Open Sans), light and dark.
 
-## Database note
+## Database (phase 2)
 
-The Lovable Cloud database still contains the old SalonBook tables (`supabase/migrations`). They are not used by
-MEK-SEL ERP and will be dropped when the MEK-SEL tables are created in phase 2.
+All ERP data lives in one table, `public.erp_records` (migration `supabase/migrations/20260930150000_meksel_erp_records.sql`):
+one row per record, keyed by `collection` (customers, sales_orders, purchase_orders, stock_ledger, staff, roles, …) and `id`,
+with the record itself in `data` (JSON).
+
+- `src/erp/persist.ts` loads every row into the engine at start-up, saves only the records that changed after each action,
+  and applies changes made by other users live through Supabase Realtime.
+- On the very first start (empty table) the built-in sample data is uploaded as the starting point.
+  The Administrator can start again from the sample data with **Staff master › Reset demo data**.
+- If the table is not reachable (for example, the migration has not been applied yet), the app keeps working on sample
+  data in the browser; the top bar then shows "Offline: changes stay in this browser".
+- Sign-in still uses the demo logins, so staff passwords are stored with the staff records and the publishable key can
+  read and write the table. Keep it to demo data until sign-in moves to Supabase Auth.
+- Document numbers come from shared counters that only move forward, but two people creating a document of the same type
+  at the same moment can still get the same number; the second save then overwrites the first.
+
+The old SalonBook tables from earlier migrations are not used by MEK-SEL ERP.
 
 ## Development
 

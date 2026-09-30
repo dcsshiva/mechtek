@@ -6,6 +6,7 @@ import { UI, canEdit, setUI } from "@/erp/session";
 import { bump, useErp } from "@/erp/store";
 import { Field, Modal, PageHead, Pill, Seg, closeModal, openModal, toast } from "../ui";
 import { allow } from "./proc";
+import { SYNC, resetToSample } from "@/erp/persist";
 
 const pwOk = (p: string) => p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
 /** Active staff left with full Staff + Role master access if one person's role/active flag changed. */
@@ -29,10 +30,22 @@ export function StaffPage() {
     x.active = !x.active;
     bump(); toast(`${x.name} ${x.active ? "activated" : "deactivated"}`);
   };
+  const resetData = async () => {
+    if (!window.confirm("Delete all ERP data in the database for everyone and reload the sample data?")) return;
+    try {
+      await resetToSample();
+      window.location.reload();
+    } catch (e: any) {
+      toast(`Could not reset: ${e?.message || e}`, true);
+    }
+  };
   return (
     <>
       <PageHead route="staff" title="Staff master" desc="Employees who can sign in to MEK-SEL ERP, with their department, role and login."
-        actions={canEdit("staff") ? [<button key="n" className="btn primary" onClick={() => openModal(<StaffModal />)}>Add staff</button>] : undefined} />
+        actions={canEdit("staff") ? [
+          ...(canEdit("roles") && SYNC.status === "online" ? [<button key="r" className="btn" onClick={resetData}>Reset demo data</button>] : []),
+          <button key="n" className="btn primary" onClick={() => openModal(<StaffModal />)}>Add staff</button>,
+        ] : undefined} />
       <div className="kpis">
         <div className="kpi"><span className="k-label">Staff</span><span className="k-value">{STAFF.length}</span><span className="k-foot">{act} active, {STAFF.length - act} inactive</span></div>
         <div className="kpi"><span className="k-label">Roles in use</span><span className="k-value">{new Set(STAFF.filter((x: any) => x.active).map((x: any) => x.role)).size}</span><span className="k-foot">of {ROLES.length} roles defined</span></div>

@@ -3,10 +3,12 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { STAFF, SESSION, roleBy, staffBy } from "@/erp/engine";
 import { restoreSession, signIn } from "@/erp/session";
 import { toast } from "@/components/erp/ui";
+import { ready } from "@/erp/persist";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
-  beforeLoad: () => {
+  beforeLoad: async () => {
+    await ready();
     restoreSession();
     if (SESSION.user) throw redirect({ to: "/dashboard" });
   },
