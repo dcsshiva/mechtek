@@ -399,7 +399,7 @@ export const MRS: any = [
   lines:BOM['FG-EB160'].slice(0,8).map(b=>({rm:b[1],qty:b[2],appr:b[2],iss:0})),history:[H(0,'S004','Submitted for approval','Frame fabrication starts Monday.','info')]}
 ];
 export let seq={IND:413,PO:2611,GE:983,GP:333,GRN:778,MR:561};
-export const nextId = (p,w) => `${p}-${String(seq[p]++).padStart(w||4,'0')}`;
+export const nextId = (p,w?) => `${p}-${String(seq[p]++).padStart(w||4,'0')}`;
 
 export function onOrderQty(code){
   let q=0;
@@ -483,7 +483,7 @@ export const LEAD_BY_CAT: any = [7,10,21,10,15,7,5,0];
 export const VEN_BY_CAT: any = ['V01','V02','V05','V04','V03','V03','V01','V06'];
 RM.forEach((r,i)=>{ if(r.bin==null){ r.bin=r.service?'—':`${BIN_BY_CAT[r.cat].split(' ·')[0]}-${String(i+1).padStart(2,'0')}`; r.lead=LEAD_BY_CAT[r.cat]; r.max=r.service?0:Math.ceil(r.reorder*2.5); r.vendor=['RM-MTR-AC05G','RM-MTR-GM15','RM-SERVO-1K','RM-VFD-05'].includes(r.code)?'V03':VEN_BY_CAT[r.cat]; } });
 export const LEDGER: any = [];
-export function stockMove(code,q,type,ref,date,by){ const r=rmBy[code]; if(!r||r.service||!q) return; r.onHand=Math.round((r.onHand+q)*1000)/1000; const n=new Date();
+export function stockMove(code,q,type,ref,date?,by?){ const r=rmBy[code]; if(!r||r.service||!q) return; r.onHand=Math.round((r.onHand+q)*1000)/1000; const n=new Date();
   LEDGER.push({at:date||new Date(TODAY),time:date?'':n.toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'}),rm:code,type,ref,qin:q>0?q:0,qout:q<0?-q:0,bal:r.onHand,by:by||SESSION.user||'S005'}); }
 (function seedLedger(){
   const moves=[[-9,'RM-AL6061-PL25',-102,'Issue to production','MR-0558 · WO-3093','S005'],[-9,'RM-D2-BLK',-30,'Issue to production','MR-0558 · WO-3093','S005'],

@@ -8,6 +8,7 @@ import { HELP } from "@/erp/help";
 import { level, UI } from "@/erp/session";
 import { go, routeName } from "@/erp/nav";
 import { useErp } from "@/erp/store";
+import { ScreenSearch } from "./Search";
 
 export type Tone = "" | "ok" | "warn" | "bad" | "info";
 
@@ -43,6 +44,7 @@ export function PageHead({ route, title, desc, actions }: { route: string; title
   const [grp] = routeName(route);
   const ro = !["dashboard", "help", "purchase"].includes(route) && level(route) === "view";
   return (
+    <>
     <div className="page-head">
       <div>
         <div className="crumb">{grp || "Overview"}</div>
@@ -67,6 +69,8 @@ export function PageHead({ route, title, desc, actions }: { route: string; title
         {ro && actions && <SecondaryOnly>{actions}</SecondaryOnly>}
       </div>
     </div>
+    <ScreenSearch key={route} route={route} />
+    </>
   );
 }
 function SecondaryOnly({ children }: { children: ReactNode }) {

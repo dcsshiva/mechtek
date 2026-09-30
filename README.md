@@ -13,9 +13,9 @@ sample data. Phase 2 moves the data into the Lovable Cloud (Supabase) database.
 | Batch | Screens | Status |
 | --- | --- | --- |
 | 1 | Login, app shell, Dashboard, Leads, CRM desk, Customers, Quotations (with combo sets), Sales orders, Dispatch from order, Invoices | Done |
-| 2 | Product master, Combo sets, Bill of materials, Raw materials, Demand forecast, Material planning, Work orders, Dispatch | Next |
-| 3 | Purchase overview, Vendors, Indents, Purchase orders, Gate pass, GRN, Vendor bills, Stores desk, Inventory, Procurement planning, Material requisition | Planned |
-| 4 | Receivables, Payables, Installed base & service, Staff master, Role master, Help, global search | Planned |
+| 2 | Product master, Combo sets, Bill of materials, Raw materials, Demand forecast, Material planning, Work orders, Dispatch | Done |
+| 3 | Purchase overview, Vendors, Indents, Purchase orders, Gate pass, GRN, Vendor bills, Stores desk, Inventory, Procurement planning, Material requisition | Done |
+| 4 | Receivables, Payables, Installed base & service, Staff master, Role master, Help, search on every screen and "Search everything" (Ctrl+K) | Done |
 
 ## Demo sign-in
 
@@ -26,8 +26,10 @@ Each role sees only the modules it is allowed (Role master), and approvals follo
 
 - `src/erp/engine.ts` — sample data and business rules (orders, GST invoices, MRP, stores, CRM). Each collection becomes a table in phase 2.
 - `src/erp/session.ts` — signed-in user, role permissions (`canSee`, `canEdit`, `canApprove`), per-screen UI state.
-- `src/erp/nav.ts` — sidebar menu and counters. `src/erp/help.ts` — "How to use this page" guides.
-- `src/components/erp/` — app shell, shared UI (`ui.tsx`), and one file per screen under `pages/`.
+- `src/erp/nav.ts` — sidebar menu and counters. `src/erp/help.ts` — "How to use this page" guides; `src/erp/guides.ts` — Help screen guides.
+- `src/erp/forecast.ts` — demand forecast methods, backtest and forecast-driven material requirement.
+- `src/components/erp/` — app shell, shared UI (`ui.tsx`), smart search (`Search.tsx`), and the screens under `pages/`
+  (sales pages, `Engineering`, `Operations`, `Forecast`, `Purchase`, `Stores`, `Finance`, `Admin`, `Help`; shared purchase/stores pieces in `proc.tsx`).
 - `src/routes/_erp/*.tsx` — one route per screen (`/dashboard`, `/quotes`, …). `src/routes/login.tsx` — sign-in.
 - `src/styles.css` — Mechtek brand theme (orange `#FD9700`, charcoal `#333333`, Montserrat + Open Sans), light and dark.
 

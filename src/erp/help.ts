@@ -71,3 +71,7 @@ HELP.forecast=['Projects the next 3 or 6 months from 12 months of sales, compare
  'In <b>Plan for the next 3 months</b>, override any quantity with what sales and production agree.',
  '<b>Raw material needed</b> shows what to buy beyond open orders for the unbooked plan; <b>Raise indent</b> sends it to purchase for approval.'],
  'Accuracy is 100% minus the weighted absolute percentage error (WAPE). Bias above zero means the method tends to over-forecast.'];
+
+// Search tips (every guide except Help and the demand forecast, as in the prototype).
+HELP.help[1].push('Use the search bar at the top of every screen, or press <b>Ctrl+K</b> to search every record.');
+Object.keys(HELP).forEach(k=>{ if(k!=='help'&&k!=='forecast'&&Array.isArray(HELP[k][1])) HELP[k][1].push('<b>Search:</b> type in the bar under the title, or use a quick filter. Try column searches like <code>customer:kaveri</code> and numbers like <code>balance&gt;1L</code>; press <b>Tips</b> for more.'); });

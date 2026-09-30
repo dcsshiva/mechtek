@@ -20,9 +20,6 @@ export const ROUTES: { group: string; items: [RouteKey, string, string][] }[] = 
   { group: "Help", items: [["help", "Help & guides", "help"]] },
 ];
 
-/** Screens already built in the React app. The rest show a "coming in the next batch" page. */
-export const BUILT = new Set<string>(["dashboard", "leads", "crm", "customers", "quotes", "orders", "invoices"]);
-
 export const routeName = (r: string): [string, string] => {
   for (const g of ROUTES) for (const i of g.items) if (i[0] === r) return [g.group, i[1]];
   return ["", ""];

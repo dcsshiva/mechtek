@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/erp/pages/ComingSoon";
+import { CombosPage } from "@/components/erp/pages/Engineering";
 
 export const Route = createFileRoute("/_erp/combos")({
   head: () => ({ meta: [{ title: "Combo sets — MEK-SEL ERP" }] }),
-  component: () => <ComingSoon route="combos" />,
+  component: CombosPage,
 });

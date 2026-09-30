@@ -5,6 +5,7 @@ import { ModalHost, closeModal, toast } from "./ui";
 import { ROUTES, navCount, setNavigator } from "@/erp/nav";
 import { canSee, me, signOut } from "@/erp/session";
 import { useErp } from "@/erp/store";
+import { SearchIcon, openGlobalSearch } from "./Search";
 
 const THEME_KEY = "meksel_theme";
 function currentTheme() {
@@ -36,6 +37,21 @@ export function AppShell({ children }: { children: ReactNode }) {
     setTheme(currentTheme());
   }, [navigate]);
 
+  // Ctrl+K searches every record; "/" jumps to this screen's search bar.
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      const tag = ((e.target as HTMLElement).tagName || "").toLowerCase();
+      const typing = ["input", "textarea", "select"].includes(tag);
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openGlobalSearch(); return; }
+      if (e.key === "/" && !typing && !document.querySelector(".modal")) {
+        const i = document.getElementById("srch-q") as HTMLInputElement | null;
+        if (i) { e.preventDefault(); i.focus(); i.select(); }
+      }
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, []);
+
   const toggleTheme = () => {
     const next = currentTheme() === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
@@ -60,6 +76,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           <span className="sub">Mechtek, Bengaluru · Demo company</span>
         </div>
         <div className="spacer" />
+        <button className="gs-top" id="gs-top" onClick={openGlobalSearch} aria-label="Search everything">
+          <SearchIcon /><span>Search everything</span><kbd>Ctrl K</kbd>
+        </button>
         <button className="icon-btn" onClick={toggleTheme} aria-label="Switch light or dark theme" title="Switch theme">
           <Icon name={theme === "dark" ? "sun" : "moon"} />
         </button>

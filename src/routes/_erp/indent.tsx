@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/erp/pages/ComingSoon";
+import { IndentPage } from "@/components/erp/pages/Purchase";
 
 export const Route = createFileRoute("/_erp/indent")({
   head: () => ({ meta: [{ title: "Indents — MEK-SEL ERP" }] }),
-  component: () => <ComingSoon route="indent" />,
+  component: IndentPage,
 });
