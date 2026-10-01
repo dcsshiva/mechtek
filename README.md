@@ -82,6 +82,10 @@ not just the app:
   The lists are in the table `public.erp_write_access`; to give a role more reach, edit a row there.
   Because a single action touches several collections (a GRN changes stock, the PO and the gate pass), each list
   names every module whose screens write that collection.
+- **Deleting:** documents and transactions (orders, invoices, POs, stock movements and so on) are never deleted by the
+  app. Only an administrator (full Staff master and Role master) may delete them, for example through
+  **Reset demo data**. Masters the app does delete from (roles, and engineering items whose code changes) follow the
+  change rule (column `can_delete`).
 - **Staff and roles** can only be changed by roles with full Staff master or Role master access, so nobody can raise
   their own access.
 - **Empty store:** while the store is empty (first run, or after **Reset demo data**), signed-in staff may load the
