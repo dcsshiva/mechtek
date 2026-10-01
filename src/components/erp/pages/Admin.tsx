@@ -117,7 +117,54 @@ export function StaffPage() {
           </table>
         </div>
       </section>
+      {canEdit("staff") && <SystemCheck />}
     </>
+  );
+}
+
+/* ================= System check ================= */
+function SystemCheck() {
+  const [report, setReport] = useState<SetupReport | null>(null);
+  const [busy, setBusy] = useState(false);
+  const run = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      setReport(await runSetupCheck());
+    } catch (e: any) {
+      toast(`The system check could not run: ${e?.message || e}`, true);
+    }
+    setBusy(false);
+  };
+  return (
+    <section className="card" style={{ marginTop: 16, padding: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+        <div style={{ flex: 1, minWidth: 220 }}>
+          <h3 style={{ margin: 0, fontSize: 15 }}>System check</h3>
+          <p className="small muted" style={{ margin: "4px 0 0" }}>
+            Confirms the Lovable Cloud connection and required settings are configured correctly.
+          </p>
+        </div>
+        {report && (report.ok ? <Pill t="All checks passed" c="ok" /> : <Pill t="Needs attention" c="bad" />)}
+        <button className="btn" onClick={run} disabled={busy}>{busy ? "Checking…" : report ? "Run again" : "Run system check"}</button>
+      </div>
+      {report && (
+        <div className="table-wrap" style={{ marginTop: 12 }}>
+          <table className="data">
+            <thead><tr><th style={{ width: 90 }}>Result</th><th>Check</th><th>Detail</th></tr></thead>
+            <tbody>
+              {report.checks.map((c) => (
+                <tr key={c.name}>
+                  <td>{c.ok ? <Pill t="Pass" c="ok" /> : <Pill t="Fail" c="bad" />}</td>
+                  <td className="cell-title">{c.name}</td>
+                  <td className="small">{c.detail}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }
 
