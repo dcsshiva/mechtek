@@ -1,9 +1,9 @@
 // Administration: staff master (logins) and role master (module access and approval rights).
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { APPROVALS, DEPTS, MODULES, MOD_KEYS, ROLES, SEQ, SESSION, STAFF, modName, roleBy, staffBy } from "@/erp/engine";
 import { TODAY, ds, isoLocal } from "@/erp/format";
 import { AUTH, UI, canEdit, setUI } from "@/erp/session";
-import { STAFF_ID_TAKEN, saveLogin } from "@/erp/accounts.functions";
+import { STAFF_ID_TAKEN, loginActivity, saveLogin } from "@/erp/accounts.functions";
 import { bump, useErp } from "@/erp/store";
 import { Field, Modal, PageHead, Pill, Seg, closeModal, openModal, toast } from "../ui";
 import { allow } from "./proc";
@@ -35,6 +35,13 @@ const adminsLeft = (exceptId: string | null, newRole?: string, newActive?: boole
 /* ================= Staff master ================= */
 export function StaffPage() {
   useErp();
+  // Last sign-in is kept by Lovable Cloud, not in the staff records.
+  useEffect(() => {
+    if (!cloud() || !canEdit("staff")) return;
+    loginActivity()
+      .then((m) => { STAFF.forEach((x: any) => { if (m[x.id]) x.lastLogin = new Date(m[x.id]!); }); bump(); })
+      .catch(() => {});
+  }, []);
   const q = (UI.stSearch || "").trim().toLowerCase();
   const list = STAFF.filter((x: any) => (UI.stRole === "all" || x.role === UI.stRole) && (UI.stStatus === "all" || (UI.stStatus === "active") === x.active) && (!q || [x.name, x.code, x.username, x.designation, x.dept].join(" ").toLowerCase().includes(q)));
   const act = STAFF.filter((x: any) => x.active).length;

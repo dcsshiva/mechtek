@@ -94,8 +94,8 @@ function stable(v: any): string {
 const toJson = (v: any) => JSON.parse(stable(v));
 
 /* ---------------- Snapshot of the engine as rows ---------------- */
-// Passwords live in Supabase Auth, never in the record store.
-const noPassword = (x: any) => ({ ...x, password: undefined });
+// Passwords and last sign-in live in Supabase Auth, never in the record store.
+const noPassword = (x: any) => ({ ...x, password: undefined, lastLogin: undefined });
 function currentRows(): Map<string, Row> {
   const out = new Map<string, Row>();
   for (const c of COLLS) {
@@ -233,9 +233,10 @@ function renumber(coll: string, rec: any, taken: Set<string> = new Set()) {
 const isUniqueViolation = (e: any) => e?.code === "23505" || /duplicate key/i.test(e?.message || "");
 
 /** Insert records that are new here; renumber any whose number is already in the database. */
-async function insertNew(cur: Map<string, Row>) {
+async function insertNew(cur: Map<string, Row>, denied: Set<string>) {
   const fresh = [...cur].filter(([k, r]) => NUMBERED[r.collection] && !saved.has(k));
   for (const [k0, r0] of fresh) {
+    if (denied.has(r0.collection)) continue;
     let k = k0, r = r0;
     const c = collBy[r.collection] as ArrColl;
     const rec = r.data.r;
@@ -244,6 +245,7 @@ async function insertNew(cur: Map<string, Row>) {
       const s = stable(r.data);
       const { error } = await db().insert({ ...r, data: JSON.parse(s), updated_by: writer() });
       if (!error) { saved.set(k, s); break; }
+      if (isDenied(error)) { denied.add(r.collection); break; }
       if (!isUniqueViolation(error) || tries >= 20) throw error;
       taken.add(r.id);
       const id = renumber(r.collection, rec, taken);
@@ -274,11 +276,36 @@ async function fetchAll(): Promise<Row[]> {
     if (!data || data.length < 1000) return out;
   }
 }
-async function upsertRows(rows: Row[]) {
-  for (let i = 0; i < rows.length; i += 400) {
-    const { error } = await db().upsert(rows.slice(i, i + 400).map((r) => ({ ...r, updated_by: writer() })), { onConflict: "collection,id" });
+/** Upsert rows; `batch` 0 sends them in one statement (used for the sample data, see the module rules migration). */
+async function upsertRows(rows: Row[], batch = 400) {
+  const n = batch || rows.length || 1;
+  for (let i = 0; i < rows.length; i += n) {
+    const { error } = await db().upsert(rows.slice(i, i + n).map((r) => ({ ...r, updated_by: writer() })), { onConflict: "collection,id" });
     if (error) throw error;
   }
+}
+
+/* ---------------- Module rules ---------------- */
+// The database refuses changes to collections the user's role may not change (see the module
+// rules migration). The app already hides those actions, so this only happens through side
+// effects; the change is then undone here so the screen matches the database again.
+const isDenied = (e: any) => e?.code === "42501" || /row-level security|permission denied/i.test(e?.message || "");
+const LABEL = (c: string) => c.replace(/_/g, " ");
+async function revertCollection(coll: string) {
+  const { data, error } = await db().select("collection,id,data").eq("collection", coll);
+  if (error) throw error;
+  const rows: Row[] = data || [];
+  const c = collBy[coll];
+  if (c.kind === "array") { c.arr.length = 0; nextOrder[coll] = 0; }
+  else if (coll !== "meta") for (const k of Object.keys(c.obj)) delete c.obj[k];
+  for (const k of [...saved.keys()]) if (k.startsWith(coll + "\u0000")) saved.delete(k);
+  rows.slice().sort((a, b) => (a.data?.o ?? 0) - (b.data?.o ?? 0)).forEach((r) => { applyRow(r); saved.set(keyOf(r), stable(r.data)); });
+  rebuildLookups();
+}
+async function handleDenied(colls: Set<string>) {
+  for (const c of colls) await revertCollection(c);
+  notify(`Your role cannot change ${[...colls].map(LABEL).join(", ")}, so that part of the change was not saved and has been undone.`);
+  bump();
 }
 
 let flushing = false, again = false, timer: any = null;
@@ -286,19 +313,39 @@ async function flush() {
   if (SYNC.status !== "online") return;
   if (flushing) { again = true; return; }
   flushing = true;
+  const denied = new Set<string>();
   try {
-    if (await insertNew(currentRows())) bump();
+    if (await insertNew(currentRows(), denied)) bump();
     const cur = currentRows();
-    const up: Row[] = [];
+    const up = new Map<string, Row[]>(); // by collection, so a refusal in one does not block the others
     const del: Row[] = [];
-    cur.forEach((r, k) => { const s = stable(r.data); if (saved.get(k) !== s) { up.push({ ...r, data: JSON.parse(s) }); saved.set(k, s); } });
-    [...saved.keys()].forEach((k) => { if (!cur.has(k)) { const [collection, id] = k.split("\u0000"); del.push({ collection, id, data: null }); saved.delete(k); } });
-    if (up.length) await upsertRows(up);
-    for (const d of del) {
-      const { error } = await db().delete().eq("collection", d.collection).eq("id", d.id);
-      if (error) throw error;
+    cur.forEach((r, k) => {
+      if (denied.has(r.collection)) return;
+      const s = stable(r.data);
+      if (saved.get(k) !== s) { if (!up.has(r.collection)) up.set(r.collection, []); up.get(r.collection)!.push({ ...r, data: JSON.parse(s) }); saved.set(k, s); }
+    });
+    [...saved.keys()].forEach((k) => { if (!cur.has(k)) { const [collection, id] = k.split("\u0000"); if (!denied.has(collection)) { del.push({ collection, id, data: null }); saved.delete(k); } } });
+    for (const [coll, rows] of up) {
+      try {
+        await upsertRows(rows);
+      } catch (e) {
+        if (!isDenied(e)) throw e;
+        denied.add(coll);
+      }
     }
-    if (up.length || del.length) SYNC.lastSaved = new Date();
+    for (const d of del) {
+      if (denied.has(d.collection)) continue;
+      // A refused delete removes nothing and reports no error, so ask for the deleted row back.
+      const { data, error } = await db().delete().eq("collection", d.collection).eq("id", d.id).select("id");
+      if (error && !isDenied(error)) throw error;
+      if (error) denied.add(d.collection);
+      else if (!data?.length) {
+        const { data: still } = await db().select("id").eq("collection", d.collection).eq("id", d.id);
+        if (still?.length) denied.add(d.collection); // still there: the delete was refused
+      }
+    }
+    if (denied.size) await handleDenied(denied);
+    if (up.size || del.length) SYNC.lastSaved = new Date();
     SYNC.error = "";
   } catch (e: any) {
     SYNC.error = e?.message || String(e);
@@ -372,7 +419,7 @@ async function start() {
     }
     let rows = (await fetchAll()).filter((r) => collBy[r.collection]);
     if (!rows.length) {
-      await upsertRows(SEED); // first run: the sample data becomes the starting point
+      await upsertRows(SEED, 0); // first run: the sample data becomes the starting point
       rows = SEED;
     }
     loadAll(rows);
@@ -393,5 +440,5 @@ async function start() {
 export async function resetToSample() {
   const { error } = await db().delete().neq("collection", "");
   if (error) throw error;
-  await upsertRows(SEED);
+  await upsertRows(SEED, 0);
 }
