@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { SESSION, roleBy, staffBy } from "@/erp/engine";
 import { AUTH, DEMO_ACCOUNTS, restoreSession, signIn } from "@/erp/session";
+import { connectionOk } from "@/erp/setupcheck";
 import { toast } from "@/components/erp/ui";
 
 export const Route = createFileRoute("/login")({
@@ -24,6 +25,13 @@ function LoginPage() {
   const [pass, setPass] = useState<string>(pick?.password || "");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  const [offline, setOffline] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    connectionOk().then((ok) => { if (live && !ok) setOffline(true); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
 
   const choose = (id: string) => {
     const x = DEMO_ACCOUNTS.find((z) => z.id === id)!;
