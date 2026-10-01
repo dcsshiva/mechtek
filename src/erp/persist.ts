@@ -94,10 +94,12 @@ function stable(v: any): string {
 const toJson = (v: any) => JSON.parse(stable(v));
 
 /* ---------------- Snapshot of the engine as rows ---------------- */
+// Passwords live in Supabase Auth, never in the record store.
+const noPassword = (x: any) => ({ ...x, password: undefined });
 function currentRows(): Map<string, Row> {
   const out = new Map<string, Row>();
   for (const c of COLLS) {
-    if (c.kind === "array") c.arr.forEach((x, i) => { const m = recMeta(c, x, i); out.set(c.name + "\u0000" + m.k, { collection: c.name, id: m.k, data: { o: m.o, r: x } }); });
+    if (c.kind === "array") c.arr.forEach((x, i) => { const m = recMeta(c, x, i); out.set(c.name + "\u0000" + m.k, { collection: c.name, id: m.k, data: { o: m.o, r: c.name === "staff" ? noPassword(x) : x } }); });
     else for (const k of Object.keys(c.obj)) out.set(c.name + "\u0000" + k, { collection: c.name, id: k, data: { r: c.obj[k] } });
   }
   return out;
@@ -206,7 +208,7 @@ async function flush() {
     console.error("[MEK-SEL] could not save to the database:", e);
     // Forget what failed so the next change retries it.
     saved.clear();
-    (await fetchAll().catch(() => [])).forEach((r) => saved.set(keyOf(r), stable(r.data)));
+    (await fetchAll().catch(() => [])).filter((r) => collBy[r.collection]).forEach((r) => saved.set(keyOf(r), stable(r.data)));
     notify("Could not save the last change to the database. It will be retried with your next change.");
   } finally {
     flushing = false;
@@ -228,12 +230,13 @@ function subscribeRemote() {
     .on("postgres_changes", { event: "*", schema: "public", table: TABLE }, (p: any) => {
       if (p.eventType === "DELETE") {
         const o = p.old || {};
-        if (!o.collection) return;
+        if (!o.collection || !collBy[o.collection]) return;
         if (!saved.has(keyOf(o))) return;
         saved.delete(keyOf(o));
         removeRow(o.collection, o.id);
       } else {
         const n = p.new as Row & { updated_by?: string };
+        if (!collBy[n.collection]) return;
         if (typeof n.updated_by === "string" && n.updated_by.endsWith("|" + TAB)) return; // our own write
         const s = stable(n.data);
         if (saved.get(keyOf(n)) === s) return; // our own write coming back
@@ -255,7 +258,16 @@ export function ready(): Promise<void> {
 }
 async function start() {
   try {
-    let rows = await fetchAll();
+    // The records are only readable once signed in to Lovable Cloud.
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
+      // Not signed in yet: work from the sample data, and load the database after sign-in.
+      SYNC.status = "offline";
+      SYNC.error = "Not signed in to Lovable Cloud";
+      readyP = null;
+      return;
+    }
+    let rows = (await fetchAll()).filter((r) => collBy[r.collection]);
     if (!rows.length) {
       await upsertRows(SEED); // first run: the sample data becomes the starting point
       rows = SEED;

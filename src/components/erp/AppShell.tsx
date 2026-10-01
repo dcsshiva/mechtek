@@ -92,9 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           title="Sign out"
           onClick={() => {
             closeModal();
-            signOut();
-            void navigate({ to: "/login" });
-            toast("Signed out");
+            void signOut();
           }}
         >
           <span className="avatar">{u.initials}</span>

@@ -45,10 +45,25 @@ with the record itself in `data` (JSON).
   The Administrator can start again from the sample data with **Staff master › Reset demo data**.
 - If the table is not reachable (for example, the migration has not been applied yet), the app keeps working on sample
   data in the browser; the top bar then shows "Offline: changes stay in this browser".
-- Sign-in still uses the demo logins, so staff passwords are stored with the staff records and the publishable key can
-  read and write the table. Keep it to demo data until sign-in moves to Supabase Auth.
 - Document numbers come from shared counters that only move forward, but two people creating a document of the same type
   at the same moment can still get the same number; the second save then overwrites the first.
+
+## Sign-in (phase 3)
+
+Staff sign in with Lovable Cloud accounts (Supabase Auth). Migration `supabase/migrations/20261001090000_meksel_erp_auth.sql`
+closes `erp_records` to anonymous visitors and removes the passwords phase 2 stored there.
+
+- Each staff member's login uses an email derived from their user ID (`<user id>@staff.meksel-erp.local`; no mail is sent)
+  and carries `app_metadata.staff_id`, which links it to the Staff master. Only accounts with that link can read or write
+  ERP records, and only the service role can set it, so self sign-ups see nothing.
+- The first sign-in on an empty database creates logins for every staff member with the demo passwords
+  (`setupDemoLogins` in `src/erp/accounts.functions.ts`). After that it does nothing.
+- Adding staff, changing a user ID or password, and activating or deactivating someone go through the `saveLogin` server
+  function. It checks that the caller's role has full Staff master access. Deactivated staff cannot sign in.
+- Passwords are never stored in the staff records.
+- If Lovable Cloud cannot be reached, the demo logins are checked in the browser and the app works offline on sample data.
+- Module access is enforced by the app, not the database: any signed-in staff member can technically read or change any
+  ERP record through the API. Per-module database rules would be a later step.
 
 The old SalonBook tables from earlier migrations are not used by MEK-SEL ERP.
 
