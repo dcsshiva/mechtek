@@ -93,6 +93,12 @@ function LoginPage() {
               </button>
             ))}
           </div>
+          {offline && (
+            <div className="error-msg" role="status">
+              Lovable Cloud is not reachable, so the app is in offline mode: the demo logins still work, but changes stay in
+              this browser. An administrator can run the System check on the Staff master page for details.
+            </div>
+          )}
           {err && <div className="error-msg" role="alert">{err}</div>}
           <div className="field">
             <label htmlFor="lg-user">User ID</label>
