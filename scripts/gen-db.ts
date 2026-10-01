@@ -158,9 +158,7 @@ for (const p of ALL) {
   (p.listCols || [])
     .filter((c) => c.label)
     .forEach((c) => (sql += `COMMENT ON COLUMN public.${p.name}.${c.column} IS ${q(c.label)};\n`));
-  sql += `DROP TRIGGER IF EXISTS erp_touch ON public.${p.name};\nCREATE TRIGGER erp_touch BEFORE UPDATE ON public.${p.name} FOR EACH ROW EXECUTE FUNCTION public.erp_touch();\n`;
 }
-sql += `DROP TRIGGER IF EXISTS erp_touch ON public.${COUNTERS_TABLE};\nCREATE TRIGGER erp_touch BEFORE UPDATE ON public.${COUNTERS_TABLE} FOR EACH ROW EXECUTE FUNCTION public.erp_touch();\n`;
 
 sql += `\n-- Documents point at customers, vendors and roles.\n`;
 for (const [t, c, ref, rc] of FKS) {
@@ -238,32 +236,40 @@ INSERT INTO public.erp_write_access (collection, modules, approvals, any_staff, 
 ON CONFLICT (collection) DO UPDATE SET any_staff = true;
 `;
 
-sql += `\n-- Row-level security, grants and Realtime for every table.\n`;
-const secure = (
-  name: string,
-  coll: string,
-) => `ALTER TABLE public.${name} ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.${name} FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.${name} TO authenticated;
-GRANT ALL ON public.${name} TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.${name};
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.${name};
-DROP POLICY IF EXISTS "ERP staff: update" ON public.${name};
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.${name};
-CREATE POLICY "ERP staff: read" ON public.${name} FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.${name} FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('${coll}')));
-CREATE POLICY "ERP staff: update" ON public.${name} FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('${coll}'))) WITH CHECK ((SELECT public.erp_can_write('${coll}')));
-CREATE POLICY "ERP staff: delete" ON public.${name} FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('${coll}')));
-ALTER TABLE public.${name} REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = '${name}') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.${name};
-  END IF;
-END $rt$;
+// Row-level security, grants, updated_at trigger and Realtime for every table, in one loop.
+// Each table is listed with the collection whose module rule applies to it.
+const pairs = [[COUNTERS_TABLE, COUNTERS_TABLE], ...ALL.map((p) => [p.name, p.coll])];
+sql += `
+-- Row-level security, grants, the updated_at trigger and Realtime for every table.
+-- Each table is checked against the module rule of its collection (column 2).
+DO $sec$
+DECLARE t text; c text;
+BEGIN
+  FOR t, c IN SELECT * FROM (VALUES
+${pairs.map(([t, c]) => `    (${q(t)}, ${q(c)})`).join(",\n")}
+  ) AS v(t, c) LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+    EXECUTE format('REVOKE ALL ON public.%I FROM anon', t);
+    EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO authenticated', t);
+    EXECUTE format('GRANT ALL ON public.%I TO service_role', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: read" ON public.%I', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: insert" ON public.%I', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: update" ON public.%I', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: delete" ON public.%I', t);
+    EXECUTE format('CREATE POLICY "ERP staff: read" ON public.%I FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()))', t);
+    EXECUTE format('CREATE POLICY "ERP staff: insert" ON public.%I FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write(%L)))', t, c);
+    EXECUTE format('CREATE POLICY "ERP staff: update" ON public.%I FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write(%L))) WITH CHECK ((SELECT public.erp_can_write(%L)))', t, c, c);
+    EXECUTE format('CREATE POLICY "ERP staff: delete" ON public.%I FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete(%L)))', t, c);
+    EXECUTE format('DROP TRIGGER IF EXISTS erp_touch ON public.%I', t);
+    EXECUTE format('CREATE TRIGGER erp_touch BEFORE UPDATE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.erp_touch()', t);
+    EXECUTE format('ALTER TABLE public.%I REPLICA IDENTITY FULL', t);
+    IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
+       AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = t) THEN
+      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', t);
+    END IF;
+  END LOOP;
+END $sec$;
 `;
-sql += secure(COUNTERS_TABLE, COUNTERS_TABLE);
-for (const p of ALL) sql += secure(p.name, p.coll);
 
 // Sample-data loader: used by the app on an empty database and by "Reset demo data".
 const order = [COUNTERS_TABLE, ...ALL.map((p) => p.name)];
