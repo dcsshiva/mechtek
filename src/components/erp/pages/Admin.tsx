@@ -3,7 +3,7 @@ import { useState } from "react";
 import { APPROVALS, DEPTS, MODULES, MOD_KEYS, ROLES, SEQ, SESSION, STAFF, modName, roleBy, staffBy } from "@/erp/engine";
 import { TODAY, ds, isoLocal } from "@/erp/format";
 import { AUTH, UI, canEdit, setUI } from "@/erp/session";
-import { saveLogin } from "@/erp/accounts.functions";
+import { STAFF_ID_TAKEN, saveLogin } from "@/erp/accounts.functions";
 import { bump, useErp } from "@/erp/store";
 import { Field, Modal, PageHead, Pill, Seg, closeModal, openModal, toast } from "../ui";
 import { allow } from "./proc";
@@ -11,12 +11,13 @@ import { SYNC, resetToSample } from "@/erp/persist";
 
 /** Signed in with Lovable Cloud: logins are changed in Supabase Auth, not in the staff record. */
 const cloud = () => AUTH.mode === "cloud";
-async function updateLogin(d: { staffId: string; username?: string; password?: string; active?: boolean }) {
+async function updateLogin(d: { staffId: string; username?: string; password?: string; active?: boolean; isNew?: boolean }) {
   if (!cloud()) return true;
   try {
     await saveLogin({ data: d });
     return true;
   } catch (e: any) {
+    if (d.isNew && e?.message === STAFF_ID_TAKEN) return "taken";
     toast(`Could not update the login: ${e?.message || e}`, true);
     return false;
   }
@@ -155,11 +156,21 @@ function StaffModal({ id }: { id?: string }) {
     const m = mobile.replace(/\s/g, "");
     const mob = m ? m.slice(0, 5) + " " + m.slice(5) : "";
     const data = { name, designation: desig, dept: f.dept, role: f.role, mobile: mob, email, doj: f.doj, username: user, active, code };
-    const sid = x ? x.id : "S" + String(SEQ.staff).padStart(3, "0");
+    const newId = () => {
+      while (STAFF.some((z: any) => z.id === "S" + String(SEQ.staff).padStart(3, "0"))) SEQ.staff++;
+      return "S" + String(SEQ.staff).padStart(3, "0");
+    };
+    let sid = x ? x.id : newId();
     setBusy(true);
-    const ok = await updateLogin({ staffId: sid, username: user, password: f.p1 || undefined, active });
+    let ok = await updateLogin({ staffId: sid, username: user, password: f.p1 || undefined, active, isNew: !x });
+    // Someone else just took this staff id: take the next one.
+    for (let i = 0; ok === "taken" && i < 20; i++) {
+      SEQ.staff++;
+      sid = newId();
+      ok = await updateLogin({ staffId: sid, username: user, password: f.p1 || undefined, active, isNew: true });
+    }
     setBusy(false);
-    if (!ok) return;
+    if (ok !== true) return;
     // Offline, the password is checked in this browser; with Lovable Cloud it lives only in Supabase Auth.
     const pw = cloud() ? {} : f.p1 ? { password: f.p1 } : {};
     if (x) Object.assign(x, data, pw);

@@ -69,7 +69,9 @@ export const setupDemoLogins = createServerFn({ method: "POST" }).handler(async 
   return { created };
 });
 
-type SaveLogin = { staffId: string; username?: string; password?: string; active?: boolean };
+type SaveLogin = { staffId: string; username?: string; password?: string; active?: boolean; isNew?: boolean };
+/** Error message when a new staff member's id is already used by someone else. */
+export const STAFF_ID_TAKEN = "Staff id already in use.";
 
 /** Administrator: create or update a staff member's login (user ID, password, active). */
 export const saveLogin = createServerFn({ method: "POST" })
@@ -91,6 +93,8 @@ export const saveLogin = createServerFn({ method: "POST" })
 
     const logins = await listLogins(sb);
     const login = logins.find((u) => u.app_metadata?.staff_id === data.staffId);
+    // Two administrators adding staff at the same moment pick the same id; the login reserves it.
+    if (data.isNew && (login || staff.some((x) => x.id === data.staffId))) throw new Error(STAFF_ID_TAKEN);
     if (data.username) {
       const taken = logins.find((u) => u.email === loginEmail(data.username!) && u !== login);
       if (taken) throw new Error("This user ID is already taken.");

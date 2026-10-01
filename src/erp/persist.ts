@@ -158,6 +158,102 @@ function loadAll(rows: Row[]) {
   rebuildLookups();
 }
 
+/* ---------------- Document numbers ---------------- */
+// Numbers come from counters in each browser, so two people can create the same number at the same
+// moment. A new numbered record is therefore inserted, never upserted: if its number is taken, the local
+// record gets the next free number (references to it in unsaved records are updated) instead of
+// overwriting the other person's document.
+type Counter = [Record<string, number>, string];
+const NUMBERED: Record<string, { field: string; counter?: (id: string) => Counter }> = {
+  customers: { field: "id" },
+  contacts: { field: "id", counter: () => [SEQ, "ct"] },
+  vendors: { field: "id", counter: () => [SEQ, "ven"] },
+  roles: { field: "id", counter: () => [SEQ, "role"] },
+  leads: { field: "id", counter: () => [SEQ, "lead"] },
+  activities: { field: "id", counter: () => [SEQ, "act"] },
+  quotations: { field: "id", counter: () => [SEQ, "q"] },
+  sales_orders: { field: "id", counter: () => [SEQ, "so"] },
+  work_orders: { field: "id", counter: () => [SEQ, "wo"] },
+  delivery_challans: { field: "id", counter: () => [SEQ, "dc"] },
+  invoices: { field: "id", counter: () => [SEQ, "inv"] },
+  installed_base: { field: "serial", counter: () => [SEQ, "serial"] },
+  service_tickets: { field: "id", counter: () => [SEQ, "tk"] },
+  indents: { field: "id", counter: () => [seq, "IND"] },
+  purchase_orders: { field: "id", counter: () => [seq, "PO"] },
+  gate_passes: { field: "id", counter: (id) => [seq, id.startsWith("GP") ? "GP" : "GE"] },
+  grns: { field: "id", counter: () => [seq, "GRN"] },
+  requisitions: { field: "id", counter: () => [seq, "MR"] },
+  vendor_bills: { field: "id", counter: () => [SEQ, "bill"] },
+  debit_notes: { field: "id", counter: () => [SEQ, "dn"] },
+  stock_adjustments: { field: "id", counter: () => [SEQ, "adj"] },
+};
+const TAIL = /(\d+)(?!.*\d)/;
+/** The same id with its number (the last run of digits, padding kept) replaced. */
+const withNumber = (id: string, n: number) => id.replace(TAIL, (d) => String(n).padStart(d.length, "0"));
+const numberOf = (id: string) => +(TAIL.exec(id)?.[1] ?? NaN);
+const prefixOf = (id: string) => id.replace(TAIL, "#");
+
+/** Replace `from` with `to` in string values (whole id or as a word inside text). */
+function rewrite(v: any, from: string, to: string): any {
+  if (typeof v === "string") {
+    if (v === from) return to;
+    return v.includes(from) ? v.replace(new RegExp("(^|[^\\w/-])" + from.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&") + "(?![\\w/-])", "g"), "$1" + to) : v;
+  }
+  if (Array.isArray(v)) { v.forEach((x, i) => (v[i] = rewrite(x, from, to))); return v; }
+  if (v && typeof v === "object" && !(v instanceof Date)) { for (const k of Object.keys(v)) v[k] = rewrite(v[k], from, to); return v; }
+  return v;
+}
+
+/**
+ * Give a local record whose number someone else already used the next free number, and update the
+ * references to it in records not yet saved. `taken` lists numbers known to be in use elsewhere.
+ */
+function renumber(coll: string, rec: any, taken: Set<string> = new Set()) {
+  const spec = NUMBERED[coll];
+  const c = collBy[coll] as ArrColl;
+  const old = String(rec[spec.field]);
+  const pre = prefixOf(old);
+  const local = new Set(c.arr.filter((x) => x !== rec).map((x) => String(x[spec.field])));
+  let n = Math.max(numberOf(old) + 1, ...c.arr.map((x) => String(x[spec.field])).filter((id) => prefixOf(id) === pre).map((id) => numberOf(id) + 1));
+  const ctr = spec.counter?.(old);
+  if (ctr) n = Math.max(n, ctr[0][ctr[1]] ?? 0);
+  while (local.has(withNumber(old, n)) || taken.has(withNumber(old, n))) n++;
+  const id = withNumber(old, n);
+  if (ctr) ctr[0][ctr[1]] = Math.max(ctr[0][ctr[1]] ?? 0, n + 1);
+  // References can only be in records changed here since the last save.
+  const cur = currentRows();
+  for (const [k, r] of cur) if (saved.get(k) !== stable(r.data)) rewrite(r.data.r, old, id);
+  rec[spec.field] = id;
+  const m = meta.get(rec);
+  if (m) m.k = id;
+  rebuildLookups();
+  notify(`${old} was also created by someone else at the same moment, so yours is now ${id}.`);
+  return id;
+}
+const isUniqueViolation = (e: any) => e?.code === "23505" || /duplicate key/i.test(e?.message || "");
+
+/** Insert records that are new here; renumber any whose number is already in the database. */
+async function insertNew(cur: Map<string, Row>) {
+  const fresh = [...cur].filter(([k, r]) => NUMBERED[r.collection] && !saved.has(k));
+  for (const [k0, r0] of fresh) {
+    let k = k0, r = r0;
+    const c = collBy[r.collection] as ArrColl;
+    const rec = r.data.r;
+    const taken = new Set<string>();
+    for (let tries = 0; ; tries++) {
+      const s = stable(r.data);
+      const { error } = await db().insert({ ...r, data: JSON.parse(s), updated_by: writer() });
+      if (!error) { saved.set(k, s); break; }
+      if (!isUniqueViolation(error) || tries >= 20) throw error;
+      taken.add(r.id);
+      const id = renumber(r.collection, rec, taken);
+      r = { collection: r.collection, id, data: { o: recMeta(c, rec, 0).o, r: rec } };
+      k = keyOf(r);
+    }
+  }
+  return fresh.length > 0;
+}
+
 /* ---------------- Sync state ---------------- */
 export type SyncStatus = "loading" | "online" | "offline";
 export const SYNC: { status: SyncStatus; error: string; lastSaved: Date | null } = { status: "loading", error: "", lastSaved: null };
@@ -191,6 +287,7 @@ async function flush() {
   if (flushing) { again = true; return; }
   flushing = true;
   try {
+    if (await insertNew(currentRows())) bump();
     const cur = currentRows();
     const up: Row[] = [];
     const del: Row[] = [];
@@ -237,6 +334,12 @@ function subscribeRemote() {
       } else {
         const n = p.new as Row & { updated_by?: string };
         if (!collBy[n.collection]) return;
+        if (NUMBERED[n.collection] && !saved.has(keyOf(n))) {
+          // Someone else saved this number while ours (same number) is still waiting to be saved.
+          const c = collBy[n.collection] as ArrColl;
+          const mine = c.arr.find((x, j) => recMeta(c, x, j).k === n.id);
+          if (mine) renumber(n.collection, mine, new Set([n.id]));
+        }
         if (typeof n.updated_by === "string" && n.updated_by.endsWith("|" + TAB)) return; // our own write
         const s = stable(n.data);
         if (saved.get(keyOf(n)) === s) return; // our own write coming back

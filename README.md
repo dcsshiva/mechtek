@@ -45,8 +45,11 @@ with the record itself in `data` (JSON).
   The Administrator can start again from the sample data with **Staff master › Reset demo data**.
 - If the table is not reachable (for example, the migration has not been applied yet), the app keeps working on sample
   data in the browser; the top bar then shows "Offline: changes stay in this browser".
-- Document numbers come from shared counters that only move forward, but two people creating a document of the same type
-  at the same moment can still get the same number; the second save then overwrites the first.
+- Document numbers come from shared counters that only move forward. If two people still create the same number at
+  the same moment, nothing is overwritten. A new document is inserted, never upserted, so the second save finds the
+  number taken. The second person's document then takes the next free number, references to it in their unsaved changes
+  are updated, and they get a message. New staff IDs are reserved through the login server function instead, because
+  logins point at them.
 
 ## Sign-in (phase 3)
 
