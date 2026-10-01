@@ -2,10 +2,26 @@
 import { useState } from "react";
 import { APPROVALS, DEPTS, MODULES, MOD_KEYS, ROLES, SEQ, SESSION, STAFF, modName, roleBy, staffBy } from "@/erp/engine";
 import { TODAY, ds, isoLocal } from "@/erp/format";
-import { UI, canEdit, setUI } from "@/erp/session";
+import { AUTH, UI, canEdit, setUI } from "@/erp/session";
+import { STAFF_ID_TAKEN, saveLogin } from "@/erp/accounts.functions";
 import { bump, useErp } from "@/erp/store";
 import { Field, Modal, PageHead, Pill, Seg, closeModal, openModal, toast } from "../ui";
 import { allow } from "./proc";
+import { SYNC, resetToSample } from "@/erp/persist";
+
+/** Signed in with Lovable Cloud: logins are changed in Supabase Auth, not in the staff record. */
+const cloud = () => AUTH.mode === "cloud";
+async function updateLogin(d: { staffId: string; username?: string; password?: string; active?: boolean; isNew?: boolean }) {
+  if (!cloud()) return true;
+  try {
+    await saveLogin({ data: d });
+    return true;
+  } catch (e: any) {
+    if (d.isNew && e?.message === STAFF_ID_TAKEN) return "taken";
+    toast(`Could not update the login: ${e?.message || e}`, true);
+    return false;
+  }
+}
 
 const pwOk = (p: string) => p.length >= 8 && /[A-Za-z]/.test(p) && /\d/.test(p);
 /** Active staff left with full Staff + Role master access if one person's role/active flag changed. */
@@ -22,17 +38,30 @@ export function StaffPage() {
   const q = (UI.stSearch || "").trim().toLowerCase();
   const list = STAFF.filter((x: any) => (UI.stRole === "all" || x.role === UI.stRole) && (UI.stStatus === "all" || (UI.stStatus === "active") === x.active) && (!q || [x.name, x.code, x.username, x.designation, x.dept].join(" ").toLowerCase().includes(q)));
   const act = STAFF.filter((x: any) => x.active).length;
-  const toggle = (x: any) => {
+  const toggle = async (x: any) => {
     if (!allow("staff")) return;
     if (x.id === SESSION.user && x.active) return toast("You cannot deactivate your own account.", true);
     if (x.active && adminsLeft(x.id, x.role, false) < 1) return toast("At least one active staff member must keep full access to Staff and Role master.", true);
+    if (!(await updateLogin({ staffId: x.id, active: !x.active }))) return;
     x.active = !x.active;
     bump(); toast(`${x.name} ${x.active ? "activated" : "deactivated"}`);
+  };
+  const resetData = async () => {
+    if (!window.confirm("Delete all ERP data in the database for everyone and reload the sample data?")) return;
+    try {
+      await resetToSample();
+      window.location.reload();
+    } catch (e: any) {
+      toast(`Could not reset: ${e?.message || e}`, true);
+    }
   };
   return (
     <>
       <PageHead route="staff" title="Staff master" desc="Employees who can sign in to MEK-SEL ERP, with their department, role and login."
-        actions={canEdit("staff") ? [<button key="n" className="btn primary" onClick={() => openModal(<StaffModal />)}>Add staff</button>] : undefined} />
+        actions={canEdit("staff") ? [
+          ...(canEdit("roles") && SYNC.status === "online" ? [<button key="r" className="btn" onClick={resetData}>Reset demo data</button>] : []),
+          <button key="n" className="btn primary" onClick={() => openModal(<StaffModal />)}>Add staff</button>,
+        ] : undefined} />
       <div className="kpis">
         <div className="kpi"><span className="k-label">Staff</span><span className="k-value">{STAFF.length}</span><span className="k-foot">{act} active, {STAFF.length - act} inactive</span></div>
         <div className="kpi"><span className="k-label">Roles in use</span><span className="k-value">{new Set(STAFF.filter((x: any) => x.active).map((x: any) => x.role)).size}</span><span className="k-foot">of {ROLES.length} roles defined</span></div>
@@ -102,8 +131,10 @@ function StaffModal({ id }: { id?: string }) {
     doj: x ? x.doj : isoLocal(TODAY), role: x?.role || ROLES[0].id, user: x?.username || "", p1: "", p2: "", active: !x || x.active ? "1" : "0",
   });
   const [e, setE] = useState<Record<string, string>>({});
+  const [busy, setBusy] = useState(false);
   const set = (k: keyof typeof f) => (v: any) => setF({ ...f, [k]: typeof v === "string" ? v : v.target.value });
-  const save = () => {
+  const save = async () => {
+    if (busy) return;
     if (!allow("staff")) return;
     const name = f.name.trim(), desig = f.desig.trim(), user = f.user.trim().toLowerCase(), mobile = f.mobile.trim(), email = f.email.trim(), code = f.code.trim(), active = f.active === "1";
     const errs: Record<string, string> = {};
@@ -125,8 +156,25 @@ function StaffModal({ id }: { id?: string }) {
     const m = mobile.replace(/\s/g, "");
     const mob = m ? m.slice(0, 5) + " " + m.slice(5) : "";
     const data = { name, designation: desig, dept: f.dept, role: f.role, mobile: mob, email, doj: f.doj, username: user, active, code };
-    if (x) { Object.assign(x, data); if (f.p1) x.password = f.p1; }
-    else STAFF.push({ id: "S" + String(SEQ.staff++).padStart(3, "0"), ...data, password: f.p1, lastLogin: null });
+    const newId = () => {
+      while (STAFF.some((z: any) => z.id === "S" + String(SEQ.staff).padStart(3, "0"))) SEQ.staff++;
+      return "S" + String(SEQ.staff).padStart(3, "0");
+    };
+    let sid = x ? x.id : newId();
+    setBusy(true);
+    let ok = await updateLogin({ staffId: sid, username: user, password: f.p1 || undefined, active, isNew: !x });
+    // Someone else just took this staff id: take the next one.
+    for (let i = 0; ok === "taken" && i < 20; i++) {
+      SEQ.staff++;
+      sid = newId();
+      ok = await updateLogin({ staffId: sid, username: user, password: f.p1 || undefined, active, isNew: true });
+    }
+    setBusy(false);
+    if (ok !== true) return;
+    // Offline, the password is checked in this browser; with Lovable Cloud it lives only in Supabase Auth.
+    const pw = cloud() ? {} : f.p1 ? { password: f.p1 } : {};
+    if (x) Object.assign(x, data, pw);
+    else { SEQ.staff++; STAFF.push({ id: sid, ...data, ...pw, lastLogin: null }); }
     closeModal(); bump(); toast(x ? `${name} updated` : `${name} added. They can sign in as ${user}.`);
   };
   const inp = (k: keyof typeof f, label: string, extra: any = {}) => (
@@ -136,7 +184,7 @@ function StaffModal({ id }: { id?: string }) {
   );
   return (
     <Modal wide title={x ? `Edit staff · ${x.name}` : "Add staff"}
-      foot={<><button className="btn" onClick={closeModal}>Cancel</button><button className="btn primary" onClick={save}>{x ? "Save changes" : "Add staff"}</button></>}>
+      foot={<><button className="btn" onClick={closeModal}>Cancel</button><button className="btn primary" onClick={save} disabled={busy}>{busy ? "Saving…" : x ? "Save changes" : "Add staff"}</button></>}>
       <div className="form-section">
         <h3>Basic details</h3>
         <div className="form-grid">
@@ -177,18 +225,23 @@ function PwModal({ id }: { id: string }) {
   const [p1, setP1] = useState("");
   const [p2, setP2] = useState("");
   const [e, setE] = useState<Record<string, string>>({});
-  const save = () => {
-    if (!allow("staff")) return;
+  const [busy, setBusy] = useState(false);
+  const save = async () => {
+    if (!allow("staff") || busy) return;
     const errs: Record<string, string> = {};
     if (!pwOk(p1)) errs.p1 = "At least 8 characters, with a letter and a number.";
     if (p1 !== p2) errs.p2 = "Passwords do not match.";
     setE(errs);
     if (Object.keys(errs).length) return;
-    x.password = p1;
+    setBusy(true);
+    const ok = await updateLogin({ staffId: x.id, username: x.username, password: p1 });
+    setBusy(false);
+    if (!ok) return;
+    if (!cloud()) x.password = p1;
     closeModal(); bump(); toast(`Password reset for ${x.name}`);
   };
   return (
-    <Modal title={`Reset password · ${x.name}`} foot={<><button className="btn" onClick={closeModal}>Cancel</button><button className="btn primary" onClick={save}>Reset password</button></>}>
+    <Modal title={`Reset password · ${x.name}`} foot={<><button className="btn" onClick={closeModal}>Cancel</button><button className="btn primary" onClick={save} disabled={busy}>{busy ? "Saving…" : "Reset password"}</button></>}>
       <p className="muted">User ID <span className="mono">{x.username}</span>. The new password takes effect at the next sign-in.</p>
       <Field id="rp-1" label="New password" err={e.p1}><PwInput id="rp-1" value={p1} onChange={setP1} err={e.p1} /></Field>
       <Field id="rp-2" label="Confirm new password" err={e.p2}><PwInput id="rp-2" value={p2} onChange={setP2} err={e.p2} /></Field>

@@ -20,3 +20,11 @@ export function useErp() {
     () => version,
   );
 }
+
+/** Subscribe to data changes outside React (used by the database sync). */
+export function onChange(cb: () => void) {
+  listeners.add(cb);
+  return () => {
+    listeners.delete(cb);
+  };
+}

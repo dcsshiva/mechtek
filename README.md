@@ -7,8 +7,8 @@ This project was built with [Lovable](https://lovable.dev) (TanStack Start + Rea
 
 ## Status
 
-Phase 1 is the **front end**: every screen of the MEK-SEL ERP prototype, rebuilt as React pages, running on in-memory
-sample data. Phase 2 moves the data into the Lovable Cloud (Supabase) database.
+Phase 1 is the **front end**: every screen of the MEK-SEL ERP prototype, rebuilt as React pages.
+Phase 2 stores the data in Lovable Cloud (Supabase), so it survives a reload and is shared by everyone using the app.
 
 | Batch | Screens | Status |
 | --- | --- | --- |
@@ -33,10 +33,42 @@ Each role sees only the modules it is allowed (Role master), and approvals follo
 - `src/routes/_erp/*.tsx` — one route per screen (`/dashboard`, `/quotes`, …). `src/routes/login.tsx` — sign-in.
 - `src/styles.css` — Mechtek brand theme (orange `#FD9700`, charcoal `#333333`, Montserrat + Open Sans), light and dark.
 
-## Database note
+## Database (phase 2)
 
-The Lovable Cloud database still contains the old SalonBook tables (`supabase/migrations`). They are not used by
-MEK-SEL ERP and will be dropped when the MEK-SEL tables are created in phase 2.
+All ERP data lives in one table, `public.erp_records` (migration `supabase/migrations/20260930150000_meksel_erp_records.sql`):
+one row per record, keyed by `collection` (customers, sales_orders, purchase_orders, stock_ledger, staff, roles, …) and `id`,
+with the record itself in `data` (JSON).
+
+- `src/erp/persist.ts` loads every row into the engine at start-up, saves only the records that changed after each action,
+  and applies changes made by other users live through Supabase Realtime.
+- On the very first start (empty table) the built-in sample data is uploaded as the starting point.
+  The Administrator can start again from the sample data with **Staff master › Reset demo data**.
+- If the table is not reachable (for example, the migration has not been applied yet), the app keeps working on sample
+  data in the browser; the top bar then shows "Offline: changes stay in this browser".
+- Document numbers come from shared counters that only move forward. If two people still create the same number at
+  the same moment, nothing is overwritten. A new document is inserted, never upserted, so the second save finds the
+  number taken. The second person's document then takes the next free number, references to it in their unsaved changes
+  are updated, and they get a message. New staff IDs are reserved through the login server function instead, because
+  logins point at them.
+
+## Sign-in (phase 3)
+
+Staff sign in with Lovable Cloud accounts (Supabase Auth). Migration `supabase/migrations/20261001090000_meksel_erp_auth.sql`
+closes `erp_records` to anonymous visitors and removes the passwords phase 2 stored there.
+
+- Each staff member's login uses an email derived from their user ID (`<user id>@staff.meksel-erp.local`; no mail is sent)
+  and carries `app_metadata.staff_id`, which links it to the Staff master. Only accounts with that link can read or write
+  ERP records, and only the service role can set it, so self sign-ups see nothing.
+- The first sign-in on an empty database creates logins for every staff member with the demo passwords
+  (`setupDemoLogins` in `src/erp/accounts.functions.ts`). After that it does nothing.
+- Adding staff, changing a user ID or password, and activating or deactivating someone go through the `saveLogin` server
+  function. It checks that the caller's role has full Staff master access. Deactivated staff cannot sign in.
+- Passwords are never stored in the staff records.
+- If Lovable Cloud cannot be reached, the demo logins are checked in the browser and the app works offline on sample data.
+- Module access is enforced by the app, not the database: any signed-in staff member can technically read or change any
+  ERP record through the API. Per-module database rules would be a later step.
+
+The old SalonBook tables from earlier migrations are not used by MEK-SEL ERP.
 
 ## Development
 

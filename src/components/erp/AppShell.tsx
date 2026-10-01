@@ -6,6 +6,7 @@ import { ROUTES, navCount, setNavigator } from "@/erp/nav";
 import { canSee, me, signOut } from "@/erp/session";
 import { useErp } from "@/erp/store";
 import { SearchIcon, openGlobalSearch } from "./Search";
+import { SYNC, setSyncNotifier } from "@/erp/persist";
 
 const THEME_KEY = "meksel_theme";
 function currentTheme() {
@@ -36,6 +37,8 @@ export function AppShell({ children }: { children: ReactNode }) {
     }
     setTheme(currentTheme());
   }, [navigate]);
+
+  useEffect(() => setSyncNotifier((m) => toast(m, true)), []);
 
   // Ctrl+K searches every record; "/" jumps to this screen's search bar.
   useEffect(() => {
@@ -73,7 +76,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         <img className="brand-logo" src="/mechtek-logo.png" alt="Mechtek" width={47} height={42} />
         <div style={{ display: "flex", flexDirection: "column", minWidth: 0, lineHeight: 1.2 }}>
           <span className="title">MEK-SEL ERP</span>
-          <span className="sub">Mechtek, Bengaluru · Demo company</span>
+          <span className="sub" title={SYNC.error || undefined}>
+            Mechtek, Bengaluru · Demo company · {SYNC.status === "online" ? "Saved to Lovable Cloud" : "Offline: changes stay in this browser"}
+          </span>
         </div>
         <div className="spacer" />
         <button className="gs-top" id="gs-top" onClick={openGlobalSearch} aria-label="Search everything">
@@ -87,9 +92,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           title="Sign out"
           onClick={() => {
             closeModal();
-            signOut();
-            void navigate({ to: "/login" });
-            toast("Signed out");
+            void signOut();
           }}
         >
           <span className="avatar">{u.initials}</span>
