@@ -16,7 +16,7 @@ export const ROUTES: { group: string; items: [RouteKey, string, string][] }[] = 
   { group: "Stores", items: [["stores", "Stores desk", "rm"], ["inventory", "Inventory", "bom"], ["planning", "Procurement planning", "mrp"], ["mr", "Material requisition", "mrq"]] },
   { group: "Finance", items: [["receivables", "Receivables", "inv"], ["payables", "Payables", "cart"]] },
   { group: "After-sales", items: [["service", "Installed base & service", "svc"]] },
-  { group: "Administration", items: [["staff", "Staff master", "staff"], ["roles", "Role master", "key"]] },
+  { group: "Administration", items: [["staff", "Staff master", "staff"], ["roles", "Role master", "key"], ["lists", "Lists & settings", "bom"]] },
   { group: "Help", items: [["help", "Help & guides", "help"]] },
 ];
 

@@ -27,6 +27,7 @@ import { Route as ErpIndentRouteImport } from './routes/_erp/indent'
 import { Route as ErpInventoryRouteImport } from './routes/_erp/inventory'
 import { Route as ErpInvoicesRouteImport } from './routes/_erp/invoices'
 import { Route as ErpLeadsRouteImport } from './routes/_erp/leads'
+import { Route as ErpListsRouteImport } from './routes/_erp/lists'
 import { Route as ErpMaterialsRouteImport } from './routes/_erp/materials'
 import { Route as ErpMrRouteImport } from './routes/_erp/mr'
 import { Route as ErpMrpRouteImport } from './routes/_erp/mrp'
@@ -135,6 +136,11 @@ const ErpInvoicesRoute = ErpInvoicesRouteImport.update({
 const ErpLeadsRoute = ErpLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => ErpRouteRoute,
+} as any)
+const ErpListsRoute = ErpListsRouteImport.update({
+  id: '/lists',
+  path: '/lists',
   getParentRoute: () => ErpRouteRoute,
 } as any)
 const ErpMaterialsRoute = ErpMaterialsRouteImport.update({
@@ -257,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof ErpInventoryRoute
   '/invoices': typeof ErpInvoicesRoute
   '/leads': typeof ErpLeadsRoute
+  '/lists': typeof ErpListsRoute
   '/materials': typeof ErpMaterialsRoute
   '/mr': typeof ErpMrRoute
   '/mrp': typeof ErpMrpRoute
@@ -296,6 +303,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof ErpInventoryRoute
   '/invoices': typeof ErpInvoicesRoute
   '/leads': typeof ErpLeadsRoute
+  '/lists': typeof ErpListsRoute
   '/materials': typeof ErpMaterialsRoute
   '/mr': typeof ErpMrRoute
   '/mrp': typeof ErpMrpRoute
@@ -337,6 +345,7 @@ export interface FileRoutesById {
   '/_erp/inventory': typeof ErpInventoryRoute
   '/_erp/invoices': typeof ErpInvoicesRoute
   '/_erp/leads': typeof ErpLeadsRoute
+  '/_erp/lists': typeof ErpListsRoute
   '/_erp/materials': typeof ErpMaterialsRoute
   '/_erp/mr': typeof ErpMrRoute
   '/_erp/mrp': typeof ErpMrpRoute
@@ -378,6 +387,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/invoices'
     | '/leads'
+    | '/lists'
     | '/materials'
     | '/mr'
     | '/mrp'
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/invoices'
     | '/leads'
+    | '/lists'
     | '/materials'
     | '/mr'
     | '/mrp'
@@ -457,6 +468,7 @@ export interface FileRouteTypes {
     | '/_erp/inventory'
     | '/_erp/invoices'
     | '/_erp/leads'
+    | '/_erp/lists'
     | '/_erp/materials'
     | '/_erp/mr'
     | '/_erp/mrp'
@@ -614,6 +626,13 @@ declare module '@tanstack/react-router' {
       path: '/leads'
       fullPath: '/leads'
       preLoaderRoute: typeof ErpLeadsRouteImport
+      parentRoute: typeof ErpRouteRoute
+    }
+    '/_erp/lists': {
+      id: '/_erp/lists'
+      path: '/lists'
+      fullPath: '/lists'
+      preLoaderRoute: typeof ErpListsRouteImport
       parentRoute: typeof ErpRouteRoute
     }
     '/_erp/materials': {
@@ -775,6 +794,7 @@ interface ErpRouteRouteChildren {
   ErpInventoryRoute: typeof ErpInventoryRoute
   ErpInvoicesRoute: typeof ErpInvoicesRoute
   ErpLeadsRoute: typeof ErpLeadsRoute
+  ErpListsRoute: typeof ErpListsRoute
   ErpMaterialsRoute: typeof ErpMaterialsRoute
   ErpMrRoute: typeof ErpMrRoute
   ErpMrpRoute: typeof ErpMrpRoute
@@ -810,6 +830,7 @@ const ErpRouteRouteChildren: ErpRouteRouteChildren = {
   ErpInventoryRoute: ErpInventoryRoute,
   ErpInvoicesRoute: ErpInvoicesRoute,
   ErpLeadsRoute: ErpLeadsRoute,
+  ErpListsRoute: ErpListsRoute,
   ErpMaterialsRoute: ErpMaterialsRoute,
   ErpMrRoute: ErpMrRoute,
   ErpMrpRoute: ErpMrpRoute,

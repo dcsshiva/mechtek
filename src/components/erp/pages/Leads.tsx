@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CUST, LEADS, LEAD_STAGES, SEQ, custBy, fgBy, leadValue } from "@/erp/engine";
+import { CUST, LEADS, LEAD_SOURCES, LEAD_STAGES, SEQ, custBy, fgBy, leadValue } from "@/erp/engine";
 import { TODAY, addDays, daysFrom, fromIso, inrShort, isoLocal } from "@/erp/format";
 import { canEdit, denyReason, myRole } from "@/erp/session";
 import { bump, useErp } from "@/erp/store";
@@ -75,7 +75,7 @@ export function openLead() {
 }
 
 function LeadModal() {
-  const [f, setF] = useState({ cust: "C006", nn: "", city: "", item: "FG-DBA", qty: "1", src: "Website", fu: isoLocal(addDays(TODAY, 2)) });
+  const [f, setF] = useState({ cust: "C006", nn: "", city: "", item: "FG-DBA", qty: "1", src: LEAD_SOURCES[0] || "Website", fu: isoLocal(addDays(TODAY, 2)) });
   const [err, setErr] = useState("");
   const set = (k: keyof typeof f) => (x: any) => setF({ ...f, [k]: x.target.value });
   const save = () => {
@@ -108,7 +108,7 @@ function LeadModal() {
         <Field id="ld-qty" label="Quantity"><input className="input" id="ld-qty" type="number" min={1} value={f.qty} onChange={set("qty")} /></Field>
         <Field id="ld-src" label="Source">
           <select className="input" id="ld-src" value={f.src} onChange={set("src")}>
-            {["Website", "CPhi expo", "P-MEC expo", "Dealer", "Repeat customer", "Installed-base alert"].map((s) => <option key={s}>{s}</option>)}
+            {LEAD_SOURCES.map((s: string) => <option key={s}>{s}</option>)}
           </select>
         </Field>
         <Field id="ld-fu" label="Next follow-up"><input className="input" id="ld-fu" type="date" value={f.fu} onChange={set("fu")} /></Field>
