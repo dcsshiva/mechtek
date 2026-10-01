@@ -1,4 +1,4 @@
-# MEK-SEL ERP
+# Selvantra Technologies
 
 Enquiry-to-dispatch ERP for **Mechtek, Bengaluru** (blister packing machines, de-foiling machines and change parts),
 built by **Selvantra Technologies**. This repository replaces the earlier SalonBook app.
@@ -7,7 +7,7 @@ This project was built with [Lovable](https://lovable.dev) (TanStack Start + Rea
 
 ## Status
 
-Phase 1 is the **front end**: every screen of the MEK-SEL ERP prototype, rebuilt as React pages.
+Phase 1 is the **front end**: every screen of the Selvantra Technologies prototype, rebuilt as React pages.
 Phase 2 stores the data in Lovable Cloud (Supabase), so it survives a reload and is shared by everyone using the app.
 
 | Batch | Screens | Status |
@@ -114,7 +114,7 @@ not just the app:
 - **Refusals:** the app already hides actions a role may not take. If a change is still refused, only that collection's
   part is undone, the screen reloads it from the database, and the user is told what was not saved.
 
-The old SalonBook tables from earlier migrations are not used by MEK-SEL ERP.
+The old SalonBook tables from earlier migrations are not used by Selvantra Technologies.
 
 ## Development
 

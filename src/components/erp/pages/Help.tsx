@@ -24,7 +24,7 @@ export function HelpPage() {
   }, []);
   return (
     <>
-      <PageHead route="help" title="Help & guides" desc="Step-by-step guides for creating a bill of materials and running the procurement and stores cycle in MEK-SEL ERP." />
+      <PageHead route="help" title="Help & guides" desc="Step-by-step guides for creating a bill of materials and running the procurement and stores cycle in Selvantra Technologies." />
       <div className="help-wrap">
         <nav className="help-toc card" style={{ padding: 8 }} aria-label="Guides">
           {TOC.map(([id, t]) => <a key={id} href={"#" + id} onClick={(e) => { e.preventDefault(); jump(id); }}>{t}</a>)}

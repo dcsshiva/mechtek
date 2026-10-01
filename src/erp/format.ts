@@ -1,4 +1,4 @@
-// Formatting and date helpers shared by every MEK-SEL ERP screen.
+// Formatting and date helpers shared by every Selvantra Technologies screen.
 
 export const inr = (n: number) => "₹ " + Math.round(n).toLocaleString("en-IN");
 export const inrShort = (n: number) =>

@@ -1,4 +1,4 @@
-// Shared building blocks for MEK-SEL ERP screens: pills, page header, modals, toasts, history.
+// Shared building blocks for Selvantra Technologies screens: pills, page header, modals, toasts, history.
 import { useEffect, useRef, useSyncExternalStore, type ReactNode } from "react";
 import { toast as sonner } from "sonner";
 import { Icon } from "./Icon";

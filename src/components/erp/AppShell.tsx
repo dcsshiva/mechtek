@@ -75,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </button>
         <img className="brand-logo" src="/mechtek-logo.png" alt="Mechtek" width={47} height={42} />
         <div style={{ display: "flex", flexDirection: "column", minWidth: 0, lineHeight: 1.2 }}>
-          <span className="title">MEK-SEL ERP</span>
+          <span className="title">Selvantra Technologies</span>
           <span className="sub" title={SYNC.error || undefined}>
             Mechtek, Bengaluru · Demo company · {SYNC.status === "online" ? "Saved to Lovable Cloud" : "Offline: changes stay in this browser"}
           </span>
@@ -131,7 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="main" id="main">
           {children}
           <p className="footer-note">
-            MEK-SEL ERP prototype · built by Selvantra Technologies for Mechtek · product names and specs from mechtek.in; BOMs,
+            Selvantra Technologies prototype · built by Selvantra Technologies for Mechtek · product names and specs from mechtek.in; BOMs,
             rates, customers and transactions are sample data
           </p>
         </main>

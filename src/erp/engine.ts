@@ -1,7 +1,7 @@
 // @ts-nocheck
 /*
- * MEK-SEL ERP — in-memory data engine (sample data + business rules).
- * Ported from the MEK-SEL ERP HTML prototype. Every screen reads and mutates these
+ * Selvantra Technologies — in-memory data engine (sample data + business rules).
+ * Ported from the Selvantra Technologies HTML prototype. Every screen reads and mutates these
  * collections; call bump() from store.ts after a change so React re-renders.
  * Backend phase: each collection maps to a Lovable Cloud (Supabase) table.
  */

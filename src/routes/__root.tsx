@@ -80,17 +80,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "MEK-SEL ERP — Mechtek, Bengaluru" },
+      { title: "Selvantra Technologies — Mechtek, Bengaluru" },
       {
         name: "description",
         content:
-          "MEK-SEL ERP: enquiry-to-dispatch ERP prototype for Mechtek's blister packing machines, de-foiling machines and change parts. Built by Selvantra Technologies.",
+          "Selvantra Technologies: enquiry-to-dispatch ERP prototype for Mechtek's blister packing machines, de-foiling machines and change parts. Built by Selvantra Technologies.",
       },
       { name: "author", content: "Selvantra Technologies" },
       { property: "og:type", content: "website" },
       { name: "theme-color", content: "#FD9700" },
       { name: "mobile-web-app-capable", content: "yes" },
-      { property: "og:title", content: "MEK-SEL ERP — Mechtek, Bengaluru" },
+      { property: "og:title", content: "Selvantra Technologies — Mechtek, Bengaluru" },
       { property: "og:description", content: "Enquiry to dispatch, in one system. ERP prototype for Mechtek by Selvantra Technologies." },
     ],
     links: [

@@ -1,4 +1,4 @@
-// MEK-SEL ERP database layout: one table per kind of record, with real columns, plus a line table
+// Selvantra Technologies database layout: one table per kind of record, with real columns, plus a line table
 // for every list inside a document (quotation lines, PO lines, approval history, ...).
 //
 // This file is the single source of truth for the layout:

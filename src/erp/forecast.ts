@@ -2,7 +2,7 @@
 /*
  * Demand forecast engine: 12 months of (sample) sales history per product, six forecasting methods
  * backtested on the last 4 months, known demand from open orders and the CRM pipeline, and the
- * raw-material requirement for the unbooked plan. Ported from the MEK-SEL ERP prototype.
+ * raw-material requirement for the unbooked plan. Ported from the Selvantra Technologies prototype.
  */
 import { BOM, FG, LEADS, ORDERS, QUOTES, fgBy, onOrderQty, openOrders, rmBy, woOf } from "./engine";
 import { TODAY, inrShort } from "./format";
