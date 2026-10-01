@@ -142,7 +142,7 @@ export const myRole = (): any => {
 };
 export type Level = "none" | "view" | "full";
 export const level = (k: string): Level =>
-  k === "dashboard" || k === "help" ? "view" : ((myRole() || { perms: {} }).perms[k] || "none");
+  k === "dashboard" || k === "help" || k === "lists" ? "view" : ((myRole() || { perms: {} }).perms[k] || "none");
 export const canSee = (r: string) => level(r) !== "none";
 export const canEdit = (k: string) => level(k) === "full";
 export const canApprove = (t: string) => !!(myRole() && myRole().approvals && myRole().approvals[t]);
@@ -187,6 +187,7 @@ export const UI: Record<string, any> = {
   stSearch: "",
   stRole: "all",
   stStatus: "active",
+  listGroup: "Materials",
 };
 export const setUI = (patch: Record<string, any>) => {
   Object.assign(UI, patch);

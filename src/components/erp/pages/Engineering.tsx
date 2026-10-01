@@ -1,7 +1,7 @@
 // Engineering: product master, combo sets (parent–child items), bill of materials and raw material master.
 import { useEffect, useState } from "react";
 import {
-  BOM, BOMREV, CATS, CAT_VAR, CHILD_ITEMS, COMBOS, DENS, FG, G, LEAD_BY_CAT, RM, SESSION, USERS, VEN_BY_CAT,
+  BOM, BOMREV, CATS, CAT_VAR, CHILD_ITEMS, COMBOS, DENS, FAMILIES, FG, G, LEAD_BY_CAT, RM, SESSION, UOMS, USERS, VEN_BY_CAT,
   bomCost, bomVer, fgBy, hsnOf, kindLabel, mk, parseAlt, rmBy, stockMove, stockStatus, whereUsed,
 } from "@/erp/engine";
 import { TODAY, ds, inr, inrShort, qfmt } from "@/erp/format";
@@ -60,7 +60,7 @@ export function ProductsPage() {
 
 function FgModal({ code }: { code?: string }) {
   const f = code ? fgBy[code] : null;
-  const fams = [...new Set(FG.map((x: any) => x.family))] as string[];
+  const fams = [...new Set([...FAMILIES, ...FG.map((x: any) => x.family)])] as string[];
   const [v, setV] = useState({
     code: f ? f.code : "FG-", name: f?.name || "", fam: f?.family || "", sub: f?.sub || "", kind: f?.kind || "machine",
     hsn: f ? hsnOf(f.code) : "8422 40 00", price: f ? String(f.price) : "", url: f?.url || "https://mechtek.in/",
@@ -728,7 +728,7 @@ function RmModal({ code }: { code?: string }) {
           <select className="input" id="rm-cat-m" value={v.cat} onChange={set("cat")}>{CATS.map((c: string, i: number) => <option key={i} value={String(i)}>{c}</option>)}</select>
         </Field>
         <Field id="rm-uom" label="Stock (base) unit">
-          <select className="input" id="rm-uom" value={v.uom} onChange={set("uom")} disabled={!!r}>{["kg", "m", "m²", "nos", "set", "L"].map((u) => <option key={u}>{u}</option>)}</select>
+          <select className="input" id="rm-uom" value={v.uom} onChange={set("uom")} disabled={!!r}>{[...new Set([...UOMS, v.uom].filter(Boolean))].map((u: string) => <option key={u}>{u}</option>)}</select>
         </Field>
         <Field id="rm-rate" label="Rate per base unit (₹) *" err={e.rate}><input className={`input num ${e.rate ? "invalid" : ""}`} id="rm-rate" type="number" min={0} step="any" value={v.rate} onChange={set("rate")} /></Field>
         <Field id="rm-reorder" label="Reorder level"><input className="input num" id="rm-reorder" type="number" min={0} step="any" value={v.reorder} onChange={set("reorder")} /></Field>

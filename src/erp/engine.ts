@@ -415,7 +415,7 @@ export const bomVer = c => (BOMREV[c]||[]).length ? BOMREV[c][BOMREV[c].length-1
 
 /* ================= o2c ================= */
 export const COMPANY: any = {name:'Mechtek',addr:'Plot No 21/2, Shed No 6, Battarahalli, Virgo Nagar Post, Bengaluru 560049',state:'Karnataka',code:'29',gstin:'29AAAAA0000A1Z5'};
-export const GST_RATE = 18;
+export let GST_RATE = 18;
 export const STATES: any = [['Karnataka','29'],['Tamil Nadu','33'],['Kerala','32'],['Andhra Pradesh','37'],['Telangana','36'],['Maharashtra','27'],['Gujarat','24'],['Goa','30'],['Madhya Pradesh','23'],['Himachal Pradesh','02'],['Uttarakhand','05'],['Punjab','03'],['Haryana','06'],['Delhi','07'],['Uttar Pradesh','09'],['Sikkim','11'],['West Bengal','19'],['Telangana','36']].filter((x,i,a)=>a.findIndex(y=>y[0]===x[0])===i);
 export const stateCode = n => (STATES.find(s=>s[0]===n)||[,''])[1];
 export const GSTIN_RE = /^\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]$/;
@@ -464,7 +464,7 @@ export function poTotals(p){ const v=venBy(p.vendor); const taxable=p.lines.redu
 export const BILLS: any = [{id:'BILL-0301',vinv:'PA/INV/1187',vdate:addDays(TODAY,-3),date:addDays(TODAY,-2),vendor:'V02',grn:'GRN-0777',po:'PO-2608',status:PEND,match:'On hold: mismatch',
   lines:[{rm:'RM-AL6061-PL25',qty:100,rate:480,poRate:480,accQty:96}],pays:[],history:[H(-2,'S011','Booked, on hold','Vendor billed 100 kg; GRN accepted 96 kg. 4 kg was rejected for thickness.','warn')]}];
 BILLS.forEach(b=>{ const g=GRNS.find(x=>x.id===b.grn); g.lines.forEach(l=>{ const bl=b.lines.find(y=>y.rm===l.rm); l.billed=(l.billed||0)+(bl?Math.min(bl.qty,l.acc):0); }); });
-export const DEBITS: any = [];
+export const DEBITS: any = [{id:'DN-0050',date:addDays(TODAY,-20),vendor:'V02',ref:'BILL-0296',reason:'SS 316 round bar: 4 kg billed but not accepted',taxable:2160,tax:388.8,total:2549}];
 export function billCalc(b){ const v=venBy(b.vendor); const taxable=b.lines.reduce((s,l)=>s+(l.amt!=null?l.amt:l.qty*l.rate),0); const t=taxCalc(taxable,venTax(v)); return {taxable,...t,total:Math.round(taxable+t.tax)}; }
 export const billPayable = b => b.status==='Rejected'?0:(b.approvedTotal!=null?b.approvedTotal:billCalc(b).total);
 export const billPaid = b => b.pays.reduce((s,p)=>s+p.amt,0);
@@ -757,3 +757,43 @@ ROLES.forEach(r=>{ if(r.id!=='R01') r.perms.forecast={R03:'full',R05:'full',R04:
 export const QS = {draft:'Draft',pend:'Pending approval',clar:'Needs clarification',appr:'Approved',rej:'Rejected',sent:'Sent',conv:'Converted'};
 export const USERS: any = new Proxy({}, {get:(t,k)=>{ const x=staffBy(k); return x?{name:x.name,title:(roleBy(x.role)||{}).name||x.designation,initials:x.name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0]).join('').toUpperCase(),pass:x.password}:{name:'Unknown',title:'',initials:'?'}; }});
 export function logQ(q,act,note,cls){ q.history.push({at:new Date(TODAY),time:nowTime(),by:SESSION.user,act,note:note||'',cls:cls||''}); }
+
+/* ================= lists (editable masters) ================= */
+// Drop-down lists kept in the database (Lists screen). The constants above (CATS, DEPTS, STATES, ...)
+// are rebuilt in place from these rows, so screens keep reading them as before.
+export const UOMS: any = ['kg','m','m²','nos','set','L'];
+export const LEAD_SOURCES: any = ['Website','CPhi expo','P-MEC expo','Dealer','Repeat customer','Installed-base alert'];
+export const DESIGNATIONS: any = [...new Set(STAFF.map(x=>x.designation))];
+export const FAMILIES: any = [...new Set([...FG,...CHILD_ITEMS].map(f=>f.family))];
+const named = a => a.map(name=>({code:name,name}));
+export const LIST_DATA: Record<string, any[]> = {
+  material_categories: CATS.map((name,i)=>({code:String(i),name,bin:BIN_BY_CAT[i],lead:LEAD_BY_CAT[i],vendor:VEN_BY_CAT[i]})),
+  uoms: named(UOMS),
+  lead_sources: named(LEAD_SOURCES),
+  lead_stages: named(LEAD_STAGES),
+  activity_types: named(ACT_TYPES),
+  contact_roles: named(CT_ROLES),
+  departments: named(DEPTS),
+  designations: named(DESIGNATIONS),
+  states: STATES.map(([name,gstCode])=>({code:gstCode,name,gstCode})),
+  company: [{code:'main',name:COMPANY.name,addr:COMPANY.addr,state:COMPANY.state,stateCode:COMPANY.code,gstin:COMPANY.gstin,gstRate:GST_RATE}],
+  product_families: named(FAMILIES),
+  bom_groups: Object.entries(G).map(([code,name])=>({code,name})),
+  item_kinds: Object.entries(KIND_LBL).map(([code,name])=>({code,name})),
+};
+const fill = (arr, xs) => { arr.length = 0; arr.push(...xs); };
+const fillObj = (o, entries) => { for (const k of Object.keys(o)) delete o[k]; entries.forEach(([k,v])=>{ o[k]=v; }); };
+/** Rebuild the drop-down constants from LIST_DATA (after loading or editing a list). */
+export function rebuildLists(){
+  const L = LIST_DATA, names = k => L[k].map(x=>x.name);
+  const cats = L.material_categories.slice().sort((a,b)=>+a.code-+b.code);
+  fill(CATS, []); fill(BIN_BY_CAT, []); fill(LEAD_BY_CAT, []); fill(VEN_BY_CAT, []); fill(CAT_VAR, []);
+  cats.forEach(c=>{ const i=+c.code; CATS[i]=c.name; BIN_BY_CAT[i]=c.bin||'—'; LEAD_BY_CAT[i]=c.lead||0; VEN_BY_CAT[i]=c.vendor||''; CAT_VAR[i]=`--bar-${(i%8)+1}`; });
+  fill(UOMS, names('uoms')); fill(LEAD_SOURCES, names('lead_sources')); fill(LEAD_STAGES, names('lead_stages'));
+  fill(ACT_TYPES, names('activity_types')); fill(CT_ROLES, names('contact_roles')); fill(DEPTS, names('departments'));
+  fill(DESIGNATIONS, names('designations')); fill(FAMILIES, names('product_families'));
+  fill(STATES, L.states.map(s=>[s.name,s.gstCode||s.code]));
+  fillObj(G, L.bom_groups.map(g=>[g.code,g.name])); fillObj(KIND_LBL, L.item_kinds.map(k=>[k.code,k.name]));
+  const c = L.company[0];
+  if (c) { Object.assign(COMPANY,{name:c.name||'',addr:c.addr||'',state:c.state||'',code:c.stateCode||'',gstin:c.gstin||''}); if (c.gstRate!=null) GST_RATE=c.gstRate; }
+}

@@ -29,10 +29,11 @@ async function listLogins(sb: any) {
   }
 }
 
-async function records(sb: any, collection: string): Promise<any[]> {
-  const { data, error } = await sb.from("erp_records").select("id,data").eq("collection", collection);
+/** Staff from the staff table (id, user ID, role, active). */
+async function staffRows(sb: any): Promise<StaffRec[]> {
+  const { data, error } = await sb.from("staff").select("id,username,role_id,active");
   if (error) throw error;
-  return (data || []).map((r: any) => r.data?.r).filter(Boolean);
+  return (data || []).map((r: any) => ({ id: r.id, username: r.username, role: r.role_id, active: r.active !== false }));
 }
 
 const BAN = (active: boolean) => (active ? "none" : "876000h");
@@ -47,7 +48,7 @@ export const setupDemoLogins = createServerFn({ method: "POST" }).handler(async 
   const seedPw = Object.fromEntries((SEED_STAFF as StaffRec[]).map((x) => [x.id, x.password]));
   let staff: StaffRec[] = [];
   try {
-    staff = await records(sb, "staff");
+    staff = await staffRows(sb);
   } catch {
     /* table not created yet: use the sample staff */
   }
@@ -72,10 +73,13 @@ export const setupDemoLogins = createServerFn({ method: "POST" }).handler(async 
 /** The caller must be an active staff member whose role has full Staff master access. Returns all staff. */
 async function requireStaffAdmin(sb: any, claims: any) {
   const callerId = claims?.app_metadata?.staff_id;
-  const [staff, roles] = await Promise.all([records(sb, "staff"), records(sb, "roles")]);
+  const staff = await staffRows(sb);
   const caller = staff.find((x) => x.id === callerId);
-  const role = caller && roles.find((r) => r.id === caller.role);
-  if (!caller || !caller.active || role?.perms?.staff !== "full") throw new Error("Only an administrator with full Staff master access can change logins.");
+  const { data: perm, error } = caller
+    ? await sb.from("role_permissions").select("access").eq("role_id", caller.role).eq("module", "staff").maybeSingle()
+    : { data: null, error: null };
+  if (error) throw error;
+  if (!caller || !caller.active || perm?.access !== "full") throw new Error("Only an administrator with full Staff master access can change logins.");
   return staff;
 }
 

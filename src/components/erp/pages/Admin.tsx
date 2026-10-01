@@ -1,6 +1,6 @@
 // Administration: staff master (logins) and role master (module access and approval rights).
 import { useEffect, useState } from "react";
-import { APPROVALS, DEPTS, MODULES, MOD_KEYS, ROLES, SEQ, SESSION, STAFF, modName, roleBy, staffBy } from "@/erp/engine";
+import { APPROVALS, DEPTS, DESIGNATIONS, MODULES, MOD_KEYS, ROLES, SEQ, SESSION, STAFF, modName, roleBy, staffBy } from "@/erp/engine";
 import { TODAY, ds, isoLocal } from "@/erp/format";
 import { AUTH, UI, canEdit, setUI } from "@/erp/session";
 import { STAFF_ID_TAKEN, loginActivity, saveLogin } from "@/erp/accounts.functions";
@@ -186,7 +186,8 @@ function StaffModal({ id }: { id?: string }) {
   };
   const inp = (k: keyof typeof f, label: string, extra: any = {}) => (
     <Field id={"sf-" + k} label={label} err={e[k]}>
-      <input className={`input ${extra.mono ? "mono" : ""} ${e[k] ? "invalid" : ""}`} id={"sf-" + k} type={extra.type || "text"} value={f[k]} onChange={set(k)} placeholder={extra.ph} autoComplete="off" />
+      <input className={`input ${extra.mono ? "mono" : ""} ${e[k] ? "invalid" : ""}`} id={"sf-" + k} type={extra.type || "text"} value={f[k]} onChange={set(k)} placeholder={extra.ph} autoComplete="off" list={extra.list ? "sf-" + k + "-list" : undefined} />
+      {extra.list && <datalist id={"sf-" + k + "-list"}>{extra.list.map((o: string) => <option key={o} value={o} />)}</datalist>}
     </Field>
   );
   return (
@@ -197,7 +198,7 @@ function StaffModal({ id }: { id?: string }) {
         <div className="form-grid">
           {inp("name", "Full name *")}
           {inp("code", "Employee code")}
-          {inp("desig", "Designation *", { ph: "e.g. Sales executive" })}
+          {inp("desig", "Designation *", { ph: "e.g. Sales executive", list: DESIGNATIONS })}
           <Field id="sf-dept" label="Department">
             <select className="input" id="sf-dept" value={f.dept} onChange={set("dept")}>{DEPTS.map((d: string) => <option key={d}>{d}</option>)}</select>
           </Field>

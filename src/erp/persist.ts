@@ -1,72 +1,55 @@
-// Phase 2: keeps the in-memory ERP engine in sync with Lovable Cloud (Supabase).
+// Keeps the in-memory ERP engine in sync with the Lovable Cloud (Supabase) tables.
 //
-// Every record of every engine collection is one row of public.erp_records
-// (collection, id, data). At start-up all rows are loaded into the engine; after each change
-// (bump()) the records that differ from what was last saved are upserted or deleted; and changes
-// made by other users arrive through Supabase Realtime and are applied in place.
-// If the table is empty, the built-in sample data is uploaded as the starting point.
+// Every record of every engine collection is stored as table rows (see schema.ts): a header row
+// with real columns plus line rows for the lists inside it. At start-up all rows are loaded into the
+// engine; after each change (bump()) the rows that differ from what was last saved are upserted or
+// deleted; and changes made by other users arrive through Supabase Realtime and are applied in place.
+// If the database is empty, the built-in sample data is loaded into it first.
 import { supabase } from "@/integrations/supabase/client";
 import {
-  ACTS, ADJS, BILLS, BOM, BOMREV, CHILD_ITEMS, COMBOS, CONTACTS, CUST, DCS, DEBITS, FG, GATES, GRNS, INDENTS, INSTALLED, INVOICES,
-  LEADS, LEDGER, MRS, ORDERS, POS, PRS, QUOTES, RM, ROLES, SEQ, SESSION, STAFF, TICKETS, VENDORS, WOS, fgBy, rmBy, seq,
+  CHILD_ITEMS,
+  FG,
+  LIST_DATA,
+  RM,
+  SEQ,
+  SESSION,
+  fgBy,
+  rebuildLists,
+  rmBy,
+  seq,
 } from "./engine";
 import { bump, onChange } from "./store";
+import { COLLS, collBy, sampleRows, type ArrColl, type Coll } from "./collections";
+import {
+  COUNTERS_TABLE,
+  fromPhys,
+  listToRow,
+  parentKey,
+  rowToList,
+  toPhys,
+  type ListSpec,
+  type Row,
+  type TableSpec,
+} from "./schema";
 
-const TABLE = "erp_records";
-type Row = { collection: string; id: string; data: any };
-
-type ArrColl = { name: string; kind: "array"; arr: any[]; key?: (x: any) => string };
-type MapColl = { name: string; kind: "map"; obj: Record<string, any> };
-type Coll = ArrColl | MapColl;
-
-const byId = (x: any) => x.id;
-const COLLS: Coll[] = [
-  { name: "roles", kind: "array", arr: ROLES, key: byId },
-  { name: "staff", kind: "array", arr: STAFF, key: byId },
-  { name: "customers", kind: "array", arr: CUST, key: byId },
-  { name: "contacts", kind: "array", arr: CONTACTS, key: byId },
-  { name: "vendors", kind: "array", arr: VENDORS, key: byId },
-  { name: "products", kind: "array", arr: FG, key: (x) => x.code },
-  { name: "child_items", kind: "array", arr: CHILD_ITEMS, key: (x) => x.code },
-  { name: "materials", kind: "array", arr: RM, key: (x) => x.code },
-  { name: "bom", kind: "map", obj: BOM },
-  { name: "bom_versions", kind: "map", obj: BOMREV },
-  { name: "combos", kind: "map", obj: COMBOS },
-  { name: "leads", kind: "array", arr: LEADS, key: byId },
-  { name: "activities", kind: "array", arr: ACTS, key: byId },
-  { name: "quotations", kind: "array", arr: QUOTES, key: byId },
-  { name: "sales_orders", kind: "array", arr: ORDERS, key: byId },
-  { name: "work_orders", kind: "array", arr: WOS, key: byId },
-  { name: "purchase_requests", kind: "array", arr: PRS },
-  { name: "delivery_challans", kind: "array", arr: DCS, key: byId },
-  { name: "invoices", kind: "array", arr: INVOICES, key: byId },
-  { name: "installed_base", kind: "array", arr: INSTALLED, key: (x) => x.serial },
-  { name: "service_tickets", kind: "array", arr: TICKETS, key: byId },
-  { name: "indents", kind: "array", arr: INDENTS, key: byId },
-  { name: "purchase_orders", kind: "array", arr: POS, key: byId },
-  { name: "gate_passes", kind: "array", arr: GATES, key: byId },
-  { name: "grns", kind: "array", arr: GRNS, key: byId },
-  { name: "requisitions", kind: "array", arr: MRS, key: byId },
-  { name: "vendor_bills", kind: "array", arr: BILLS, key: byId },
-  { name: "debit_notes", kind: "array", arr: DEBITS, key: byId },
-  { name: "stock_ledger", kind: "array", arr: LEDGER },
-  { name: "stock_adjustments", kind: "array", arr: ADJS, key: byId },
-  { name: "meta", kind: "map", obj: { SEQ, seq } },
-];
-const collBy = Object.fromEntries(COLLS.map((c) => [c.name, c]));
-
-/* ---------------- Keys and order for array records ---------------- */
+/* ---------------- Keys and order of records ---------------- */
 // Records without a natural id (stock ledger lines) get a generated key; every array record keeps
 // its position so lists come back in the same order. Both live beside the record, not inside it.
 const meta = new WeakMap<object, { k: string; o: number }>();
 const nextOrder: Record<string, number> = {};
 let keySeq = 0;
-const fallbackKey = () => Date.now().toString(36) + (keySeq++).toString(36) + Math.random().toString(36).slice(2);
+const fallbackKey = () =>
+  Date.now().toString(36) + (keySeq++).toString(36) + Math.random().toString(36).slice(2);
 // Cloudflare Workers refuse crypto random values while a module loads (the server render imports
 // this file), so fall back there; server-made keys are never saved.
 const newKey = () => {
-  try { return typeof globalThis.crypto?.randomUUID === "function" ? crypto.randomUUID() : fallbackKey(); }
-  catch { return fallbackKey(); }
+  try {
+    return typeof globalThis.crypto?.randomUUID === "function"
+      ? crypto.randomUUID()
+      : fallbackKey();
+  } catch {
+    return fallbackKey();
+  }
 };
 function recMeta(c: ArrColl, x: any, idx: number) {
   let m = meta.get(x);
@@ -79,42 +62,153 @@ function recMeta(c: ArrColl, x: any, idx: number) {
   return m;
 }
 
-/* ---------------- JSON with dates ---------------- */
-const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/;
-function revive(v: any): any {
-  if (typeof v === "string") return ISO.test(v) ? new Date(v) : v;
-  if (Array.isArray(v)) return v.map(revive);
-  if (v && typeof v === "object") {
-    const o: any = {};
-    for (const k of Object.keys(v)) o[k] = revive(v[k]);
-    return o;
-  }
-  return v;
-}
-/** Key-order independent JSON (jsonb reorders keys), with dates as ISO strings. */
+/** Key-order independent JSON; null and undefined fields are the same (the database stores both as NULL). */
 function stable(v: any): string {
   if (v instanceof Date) return JSON.stringify(v.toISOString());
   if (Array.isArray(v)) return "[" + v.map(stable).join(",") + "]";
-  if (v && typeof v === "object") return "{" + Object.keys(v).filter((k) => v[k] !== undefined).sort().map((k) => JSON.stringify(k) + ":" + stable(v[k])).join(",") + "}";
+  if (v && typeof v === "object")
+    return (
+      "{" +
+      Object.keys(v)
+        .filter((k) => v[k] != null)
+        .sort()
+        .map((k) => JSON.stringify(k) + ":" + stable(v[k]))
+        .join(",") +
+      "}"
+    );
   return v === undefined ? "null" : JSON.stringify(v);
 }
-const toJson = (v: any) => JSON.parse(stable(v));
 
-/* ---------------- Snapshot of the engine as rows ---------------- */
-// Passwords and last sign-in live in Supabase Auth, never in the record store.
-const noPassword = (x: any) => ({ ...x, password: undefined, lastLogin: undefined });
-function currentRows(): Map<string, Row> {
-  const out = new Map<string, Row>();
+/* ---------------- Records as rows ---------------- */
+type PRow = {
+  table: string;
+  coll: string;
+  rec: string;
+  pk: Record<string, any>;
+  row: Row;
+  header: boolean;
+};
+const isList = (c: Coll): c is ArrColl => c.kind === "array" && !!c.list;
+const tspec = (c: Coll) => c.spec as TableSpec;
+const recKey = (coll: string, key: string) => coll + "\u0000" + key;
+const rowKey = (table: string, pk: Record<string, any>) =>
+  table + "\u0000" + Object.values(pk).join("\u0000");
+
+/** Every record of the engine, with its key and position. */
+function* records(c: Coll): Generator<[string, any, number]> {
+  if (c.kind === "array") {
+    for (let i = 0; i < c.arr.length; i++) {
+      const m = recMeta(c, c.arr[i], i);
+      yield [m.k, c.arr[i], m.o];
+    }
+  } else for (const [i, k] of Object.keys(c.obj).entries()) yield [k, c.obj[k], i];
+}
+/** The table rows of one record. */
+function rowsOf(c: Coll, key: string, rec: any, order: number): PRow[] {
+  const rk = recKey(c.name, key);
+  if (isList(c))
+    return [
+      {
+        table: c.spec.table,
+        coll: c.name,
+        rec: rk,
+        pk: { code: key },
+        row: listToRow(c.spec as ListSpec, rec, order),
+        header: true,
+      },
+    ];
+  const t = tspec(c);
+  const p = toPhys(t, key, rec, order);
+  const out: PRow[] = [];
+  if (p.header)
+    out.push({
+      table: t.table,
+      coll: c.name,
+      rec: rk,
+      pk: { [t.pk.column]: key },
+      row: p.header,
+      header: true,
+    });
+  for (const ch of t.children)
+    for (const r of p.kids[ch.table] || [])
+      out.push({
+        table: ch.table,
+        coll: c.name,
+        rec: rk,
+        pk:
+          ch.kind === "map"
+            ? { [parentKey(t)]: key, [ch.keyCol!.column]: r[ch.keyCol!.column] }
+            : { [parentKey(t)]: key, line_no: r.line_no },
+        row: r,
+        header: false,
+      });
+  return out;
+}
+function currentRows(only?: Set<string>): Map<string, PRow> {
+  const out = new Map<string, PRow>();
   for (const c of COLLS) {
-    if (c.kind === "array") c.arr.forEach((x, i) => { const m = recMeta(c, x, i); out.set(c.name + "\u0000" + m.k, { collection: c.name, id: m.k, data: { o: m.o, r: c.name === "staff" ? noPassword(x) : x } }); });
-    else for (const k of Object.keys(c.obj)) out.set(c.name + "\u0000" + k, { collection: c.name, id: k, data: { r: c.obj[k] } });
+    if (only && !only.has(c.name)) continue;
+    for (const [k, rec, o] of records(c))
+      for (const r of rowsOf(c, k, rec, o)) out.set(rowKey(r.table, r.pk), r);
   }
   return out;
 }
 
-/* ---------------- Applying rows to the engine ---------------- */
+/** Tables of a collection: [header or list table, ...line tables]. */
+function tablesOf(c: Coll): { table: string; header: boolean }[] {
+  if (isList(c)) return [{ table: c.spec.table, header: true }];
+  const t = tspec(c);
+  return [
+    ...(t.headerless ? [] : [{ table: t.table, header: true }]),
+    ...t.children.map((ch) => ({ table: ch.table, header: false })),
+  ];
+}
+const TABLE_INFO: Record<string, { coll: string; header: boolean }> = {};
+COLLS.forEach((c) =>
+  tablesOf(c).forEach((x) => (TABLE_INFO[x.table] = { coll: c.name, header: x.header })),
+);
+/** The record key a table row belongs to. */
+function recOfRow(table: string, row: Row): string | null {
+  const info = TABLE_INFO[table];
+  if (!info) return null;
+  const c = collBy[info.coll];
+  if (isList(c)) return row.code != null ? recKey(c.name, row.code) : null;
+  const t = tspec(c);
+  const v = info.header ? row[t.pk.column] : row[parentKey(t)];
+  return v != null ? recKey(c.name, String(v)) : null;
+}
+
+/** Records of a collection from its table rows. */
+function assemble(c: Coll, byTable: Record<string, Row[]>): { key: string; rec: any; o: number }[] {
+  if (isList(c))
+    return (byTable[c.spec.table] || []).map((r) => ({
+      key: String(r.code),
+      rec: rowToList(c.spec as ListSpec, r),
+      o: r.sort_order ?? 0,
+    }));
+  const t = tspec(c);
+  const pk = parentKey(t);
+  const kids: Record<string, Record<string, Row[]>> = {};
+  for (const ch of t.children)
+    for (const r of byTable[ch.table] || [])
+      ((kids[String(r[pk])] ||= {})[ch.table] ||= []).push(r);
+  const heads: [string, Row | null][] = t.headerless
+    ? Object.keys(kids).map((k) => [k, null])
+    : (byTable[t.table] || []).map((h) => [String(h[t.pk.column]), h]);
+  return heads.map(([k, h], i) => ({
+    key: k,
+    rec: fromPhys(t, h, kids[k] || {}),
+    o: h?.sort_order ?? i,
+  }));
+}
+
+/* ---------------- Applying records to the engine ---------------- */
 function replaceInPlace(target: any, src: any) {
-  if (Array.isArray(target) && Array.isArray(src)) { target.length = 0; target.push(...src); return; }
+  if (Array.isArray(target) && Array.isArray(src)) {
+    target.length = 0;
+    target.push(...src);
+    return;
+  }
   for (const k of Object.keys(target)) delete target[k];
   Object.assign(target, src);
 }
@@ -124,45 +218,49 @@ function rebuildLookups() {
   for (const k of Object.keys(fgBy)) delete fgBy[k];
   FG.forEach((f: any) => (fgBy[f.code] = f));
   CHILD_ITEMS.forEach((c: any) => (fgBy[c.code] = c));
+  rebuildLists();
 }
-function applyRow(row: Row) {
-  const c = collBy[row.collection];
-  if (!c) return;
-  const rec = revive(row.data?.r);
+function findIndex(c: ArrColl, key: string) {
+  return c.arr.findIndex((x, j) => recMeta(c, x, j).k === key);
+}
+function applyRecord(c: Coll, key: string, rec: any, o: number) {
   if (c.kind === "map") {
-    if (c.name === "meta") {
-      // Counters only move forward, so two people never get the same new document number.
-      const tgt = row.id === "SEQ" ? SEQ : row.id === "seq" ? seq : null;
-      if (tgt && rec) for (const k of Object.keys(rec)) (tgt as any)[k] = Math.max((tgt as any)[k] ?? 0, rec[k]);
-      return;
-    }
-    if (c.obj[row.id] && typeof c.obj[row.id] === "object") replaceInPlace(c.obj[row.id], rec);
-    else c.obj[row.id] = rec;
+    if (c.obj[key] && typeof c.obj[key] === "object" && typeof rec === "object")
+      replaceInPlace(c.obj[key], rec);
+    else c.obj[key] = rec;
     return;
   }
-  const o = row.data?.o ?? 0;
-  const i = c.arr.findIndex((x, j) => recMeta(c, x, j).k === row.id);
-  if (i >= 0) { replaceInPlace(c.arr[i], rec); meta.set(c.arr[i], { k: row.id, o }); return; }
-  meta.set(rec, { k: row.id, o });
+  const i = findIndex(c, key);
+  if (i >= 0) {
+    replaceInPlace(c.arr[i], rec);
+    meta.set(c.arr[i], { k: key, o });
+    return;
+  }
+  meta.set(rec, { k: key, o });
   nextOrder[c.name] = Math.max(nextOrder[c.name] ?? 0, o + 1);
   let at = c.arr.findIndex((x) => (meta.get(x)?.o ?? 0) > o);
   if (at < 0) at = c.arr.length;
   c.arr.splice(at, 0, rec);
 }
-function removeRow(collection: string, id: string) {
-  const c = collBy[collection];
-  if (!c) return;
-  if (c.kind === "map") { if (c.name !== "meta") delete c.obj[id]; return; }
-  const i = c.arr.findIndex((x, j) => recMeta(c, x, j).k === id);
+function removeRecord(c: Coll, key: string) {
+  if (c.kind === "map") {
+    delete c.obj[key];
+    return;
+  }
+  const i = findIndex(c, key);
   if (i >= 0) c.arr.splice(i, 1);
 }
-function loadAll(rows: Row[]) {
-  for (const c of COLLS) {
-    if (c.kind === "array") { c.arr.length = 0; nextOrder[c.name] = 0; }
-    else if (c.name !== "meta") for (const k of Object.keys(c.obj)) delete c.obj[k];
-  }
-  rows.slice().sort((a, b) => (a.data?.o ?? 0) - (b.data?.o ?? 0)).forEach(applyRow);
-  rebuildLookups();
+function clearColl(c: Coll) {
+  if (c.kind === "array") {
+    c.arr.length = 0;
+    nextOrder[c.name] = 0;
+  } else for (const k of Object.keys(c.obj)) delete c.obj[k];
+}
+function loadColl(c: Coll, byTable: Record<string, Row[]>) {
+  clearColl(c);
+  assemble(c, byTable)
+    .sort((a, b) => a.o - b.o)
+    .forEach((r) => applyRecord(c, r.key, r.rec, r.o));
 }
 
 /* ---------------- Document numbers ---------------- */
@@ -196,7 +294,8 @@ const NUMBERED: Record<string, { field: string; counter?: (id: string) => Counte
 };
 const TAIL = /(\d+)(?!.*\d)/;
 /** The same id with its number (the last run of digits, padding kept) replaced. */
-const withNumber = (id: string, n: number) => id.replace(TAIL, (d) => String(n).padStart(d.length, "0"));
+const withNumber = (id: string, n: number) =>
+  id.replace(TAIL, (d) => String(n).padStart(d.length, "0"));
 const numberOf = (id: string) => +(TAIL.exec(id)?.[1] ?? NaN);
 const prefixOf = (id: string) => id.replace(TAIL, "#");
 
@@ -204,10 +303,24 @@ const prefixOf = (id: string) => id.replace(TAIL, "#");
 function rewrite(v: any, from: string, to: string): any {
   if (typeof v === "string") {
     if (v === from) return to;
-    return v.includes(from) ? v.replace(new RegExp("(^|[^\\w/-])" + from.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&") + "(?![\\w/-])", "g"), "$1" + to) : v;
+    return v.includes(from)
+      ? v.replace(
+          new RegExp(
+            "(^|[^\\w/-])" + from.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&") + "(?![\\w/-])",
+            "g",
+          ),
+          "$1" + to,
+        )
+      : v;
   }
-  if (Array.isArray(v)) { v.forEach((x, i) => (v[i] = rewrite(x, from, to))); return v; }
-  if (v && typeof v === "object" && !(v instanceof Date)) { for (const k of Object.keys(v)) v[k] = rewrite(v[k], from, to); return v; }
+  if (Array.isArray(v)) {
+    v.forEach((x, i) => (v[i] = rewrite(x, from, to)));
+    return v;
+  }
+  if (v && typeof v === "object" && !(v instanceof Date)) {
+    for (const k of Object.keys(v)) v[k] = rewrite(v[k], from, to);
+    return v;
+  }
   return v;
 }
 
@@ -221,15 +334,24 @@ function renumber(coll: string, rec: any, taken: Set<string> = new Set()) {
   const old = String(rec[spec.field]);
   const pre = prefixOf(old);
   const local = new Set(c.arr.filter((x) => x !== rec).map((x) => String(x[spec.field])));
-  let n = Math.max(numberOf(old) + 1, ...c.arr.map((x) => String(x[spec.field])).filter((id) => prefixOf(id) === pre).map((id) => numberOf(id) + 1));
+  let n = Math.max(
+    numberOf(old) + 1,
+    ...c.arr
+      .map((x) => String(x[spec.field]))
+      .filter((id) => prefixOf(id) === pre)
+      .map((id) => numberOf(id) + 1),
+  );
   const ctr = spec.counter?.(old);
   if (ctr) n = Math.max(n, ctr[0][ctr[1]] ?? 0);
   while (local.has(withNumber(old, n)) || taken.has(withNumber(old, n))) n++;
   const id = withNumber(old, n);
   if (ctr) ctr[0][ctr[1]] = Math.max(ctr[0][ctr[1]] ?? 0, n + 1);
   // References can only be in records changed here since the last save.
-  const cur = currentRows();
-  for (const [k, r] of cur) if (saved.get(k) !== stable(r.data)) rewrite(r.data.r, old, id);
+  for (const cc of COLLS)
+    for (const [k, r, o] of records(cc)) {
+      if (rowsOf(cc, k, r, o).some((x) => saved.get(rowKey(x.table, x.pk)) !== stable(x.row)))
+        rewrite(r, old, id);
+    }
   rec[spec.field] = id;
   const m = meta.get(rec);
   if (m) m.k = id;
@@ -237,133 +359,267 @@ function renumber(coll: string, rec: any, taken: Set<string> = new Set()) {
   notify(`${old} was also created by someone else at the same moment, so yours is now ${id}.`);
   return id;
 }
-const isUniqueViolation = (e: any) => e?.code === "23505" || /duplicate key/i.test(e?.message || "");
-
-/** Insert records that are new here; renumber any whose number is already in the database. */
-async function insertNew(cur: Map<string, Row>, denied: Set<string>) {
-  const fresh = [...cur].filter(([k, r]) => NUMBERED[r.collection] && !saved.has(k));
-  for (const [k0, r0] of fresh) {
-    if (denied.has(r0.collection)) continue;
-    let k = k0, r = r0;
-    const c = collBy[r.collection] as ArrColl;
-    const rec = r.data.r;
-    const taken = new Set<string>();
-    for (let tries = 0; ; tries++) {
-      const s = stable(r.data);
-      const { error } = await db().insert({ ...r, data: JSON.parse(s), updated_by: writer() });
-      if (!error) { saved.set(k, s); break; }
-      if (isDenied(error)) { denied.add(r.collection); break; }
-      if (!isUniqueViolation(error) || tries >= 20) throw error;
-      taken.add(r.id);
-      const id = renumber(r.collection, rec, taken);
-      r = { collection: r.collection, id, data: { o: recMeta(c, rec, 0).o, r: rec } };
-      k = keyOf(r);
-    }
-  }
-  return fresh.length > 0;
-}
+const isUniqueViolation = (e: any) =>
+  e?.code === "23505" || /duplicate key/i.test(e?.message || "");
+const isDenied = (e: any) =>
+  e?.code === "42501" || /row-level security|permission denied/i.test(e?.message || "");
 
 /* ---------------- Sync state ---------------- */
 export type SyncStatus = "loading" | "online" | "offline";
-export const SYNC: { status: SyncStatus; error: string; lastSaved: Date | null } = { status: "loading", error: "", lastSaved: null };
-const saved = new Map<string, string>(); // key → stable JSON of the row data last written or received
-const keyOf = (r: { collection: string; id: string }) => r.collection + "\u0000" + r.id;
-const SEED: Row[] = [...currentRows().values()].map((r) => ({ ...r, data: toJson(r.data) }));
-const db = () => (supabase as any).from(TABLE);
+export const SYNC: { status: SyncStatus; error: string; lastSaved: Date | null } = {
+  status: "loading",
+  error: "",
+  lastSaved: null,
+};
+/** Row key → stable JSON of the row as last written to or read from the database. */
+const saved = new Map<string, string>();
+/** Row key → where that saved row lives (to delete it when its record or line goes away). */
+const savedAt = new Map<string, Omit<PRow, "row" | "rec">>();
+function setSaved(r: PRow) {
+  const k = rowKey(r.table, r.pk);
+  saved.set(k, stable(r.row));
+  savedAt.set(k, { table: r.table, coll: r.coll, pk: r.pk, header: r.header });
+}
+function delSaved(k: string) {
+  saved.delete(k);
+  savedAt.delete(k);
+}
+/** The sample data as rows, taken before anything changes the engine. */
+const SEED = sampleRows();
+const tbl = (name: string) => (supabase as any).from(name);
 /** Identifies this browser tab, so its own writes echoed back by Realtime are ignored. */
 const TAB = newKey();
 const writer = () => `${SESSION.user || "-"}|${TAB}`;
+const savedCounters: Record<string, number> = {};
 
-async function fetchAll(): Promise<Row[]> {
+async function fetchTable(name: string): Promise<Row[]> {
   const out: Row[] = [];
   for (let from = 0; ; from += 1000) {
-    const { data, error } = await db().select("collection,id,data").order("collection").order("id").range(from, from + 999);
+    const { data, error } = await tbl(name)
+      .select("*")
+      .range(from, from + 999);
     if (error) throw error;
     out.push(...(data || []));
     if (!data || data.length < 1000) return out;
   }
 }
-/** Upsert rows; `batch` 0 sends them in one statement (used for the sample data, see the module rules migration). */
-async function upsertRows(rows: Row[], batch = 400) {
-  const n = batch || rows.length || 1;
-  for (let i = 0; i < rows.length; i += n) {
-    const { error } = await db().upsert(rows.slice(i, i + n).map((r) => ({ ...r, updated_by: writer() })), { onConflict: "collection,id" });
-    if (error) throw error;
+/** All rows of the given tables (all ERP tables by default), a few requests at a time. */
+async function fetchTables(names: string[]): Promise<Record<string, Row[]>> {
+  const out: Record<string, Row[]> = {};
+  const queue = [...names];
+  await Promise.all(
+    Array.from({ length: 6 }, async () => {
+      for (let n = queue.shift(); n; n = queue.shift()) out[n] = await fetchTable(n);
+    }),
+  );
+  return out;
+}
+const ALL_TABLES = Object.keys(TABLE_INFO);
+
+function applyCounters(rows: Row[]) {
+  for (const r of rows) {
+    const [m, k] = String(r.name).split(".");
+    const tgt = m === "SEQ" ? SEQ : m === "seq" ? (seq as Record<string, number>) : null;
+    if (!tgt || !k) continue;
+    const v = Number(r.value);
+    tgt[k] = Math.max(tgt[k] ?? 0, v);
+    savedCounters[r.name] = Math.max(savedCounters[r.name] ?? 0, v);
   }
+}
+async function saveCounters() {
+  const rows: Row[] = [];
+  for (const [m, o] of [
+    ["SEQ", SEQ],
+    ["seq", seq],
+  ] as [string, Record<string, number>][])
+    for (const [k, v] of Object.entries(o))
+      if ((savedCounters[`${m}.${k}`] ?? -1) < v)
+        rows.push({ name: `${m}.${k}`, value: v, updated_by: writer() });
+  if (!rows.length) return;
+  const { error } = await tbl(COUNTERS_TABLE).upsert(rows, { onConflict: "name" });
+  if (error) throw error;
+  rows.forEach((r) => (savedCounters[r.name] = r.value));
+}
+
+/** Remember the engine's rows (of the given collections) as saved. */
+function markSaved(only?: Set<string>) {
+  if (only)
+    for (const [k, a] of [...savedAt]) {
+      if (only.has(a.coll)) delSaved(k);
+    }
+  else {
+    saved.clear();
+    savedAt.clear();
+  }
+  currentRows(only).forEach((r) => setSaved(r));
 }
 
 /* ---------------- Module rules ---------------- */
-// The database refuses changes to collections the user's role may not change (see the module
-// rules migration). The app already hides those actions, so this only happens through side
-// effects; the change is then undone here so the screen matches the database again.
-const isDenied = (e: any) => e?.code === "42501" || /row-level security|permission denied/i.test(e?.message || "");
-const LABEL = (c: string) => c.replace(/_/g, " ");
-async function revertCollection(coll: string) {
-  const { data, error } = await db().select("collection,id,data").eq("collection", coll);
-  if (error) throw error;
-  const rows: Row[] = data || [];
-  const c = collBy[coll];
-  if (c.kind === "array") { c.arr.length = 0; nextOrder[coll] = 0; }
-  else if (coll !== "meta") for (const k of Object.keys(c.obj)) delete c.obj[k];
-  for (const k of [...saved.keys()]) if (k.startsWith(coll + "\u0000")) saved.delete(k);
-  rows.slice().sort((a, b) => (a.data?.o ?? 0) - (b.data?.o ?? 0)).forEach((r) => { applyRow(r); saved.set(keyOf(r), stable(r.data)); });
+// The database refuses changes to tables the user's role may not change (see the module rules
+// migration). The app already hides those actions, so this only happens through side effects; the
+// change is then undone here so the screen matches the database again.
+const LABEL = (c: string) =>
+  collBy[c] && isList(collBy[c])
+    ? (collBy[c].spec as ListSpec).label.toLowerCase()
+    : c.replace(/_/g, " ");
+async function revertCollections(colls: Set<string>) {
+  const names = [...colls].flatMap((n) => tablesOf(collBy[n]).map((x) => x.table));
+  const byTable = await fetchTables(names);
+  for (const n of colls) loadColl(collBy[n], byTable);
   rebuildLookups();
+  markSaved(colls);
 }
 async function handleDenied(colls: Set<string>) {
-  for (const c of colls) await revertCollection(c);
-  notify(`Your role cannot change ${[...colls].map(LABEL).join(", ")}, so that part of the change was not saved and has been undone.`);
+  await revertCollections(colls);
+  notify(
+    `Your role cannot change ${[...colls].map(LABEL).join(", ")}, so that part of the change was not saved and has been undone.`,
+  );
   bump();
 }
 
-let flushing = false, again = false, timer: any = null;
+/* ---------------- Saving ---------------- */
+const pkCols = (r: PRow) => Object.keys(r.pk);
+async function upsert(table: string, rows: PRow[]) {
+  const body = rows.map((r) => ({ ...r.row, updated_by: writer() }));
+  for (let i = 0; i < body.length; i += 500) {
+    const { error } = await tbl(table).upsert(body.slice(i, i + 500), {
+      onConflict: pkCols(rows[0]).join(","),
+    });
+    if (error) throw error;
+  }
+}
+/** Delete rows; returns false if the database refused (a refused delete removes nothing and reports no error). */
+async function remove(table: string, pk: Record<string, any>): Promise<boolean> {
+  let qy = tbl(table).delete();
+  for (const [k, v] of Object.entries(pk)) qy = qy.eq(k, v);
+  const { data, error } = await qy.select(Object.keys(pk).join(","));
+  if (error) {
+    if (isDenied(error)) return false;
+    throw error;
+  }
+  if (data?.length) return true;
+  let chk = tbl(table).select(Object.keys(pk)[0]);
+  for (const [k, v] of Object.entries(pk)) chk = chk.eq(k, v);
+  const { data: still } = await chk;
+  return !still?.length; // still there: the delete was refused
+}
+
+/** Insert records that are new here; renumber any whose number is already in the database. */
+async function insertNew(denied: Set<string>) {
+  let any = false;
+  for (const c of COLLS) {
+    const spec = NUMBERED[c.name];
+    if (!spec || c.kind !== "array" || denied.has(c.name)) continue;
+    const t = tspec(c);
+    for (const [k0, rec, o] of [...records(c)]) {
+      if (saved.has(rowKey(t.table, { [t.pk.column]: k0 }))) continue;
+      any = true;
+      const taken = new Set<string>();
+      for (let tries = 0; ; tries++) {
+        const k = String(rec[spec.field]);
+        const head = rowsOf(c, k, rec, o).find((r) => r.header)!;
+        const { error } = await tbl(t.table).insert({ ...head.row, updated_by: writer() });
+        if (!error) {
+          setSaved(head);
+          break;
+        }
+        if (isDenied(error)) {
+          denied.add(c.name);
+          break;
+        }
+        if (!isUniqueViolation(error) || tries >= 20) throw error;
+        taken.add(k);
+        renumber(c.name, rec, taken);
+      }
+    }
+  }
+  return any;
+}
+
+let flushing = false,
+  again = false,
+  timer: any = null;
 async function flush() {
   if (SYNC.status !== "online") return;
-  if (flushing) { again = true; return; }
+  if (flushing) {
+    again = true;
+    return;
+  }
   flushing = true;
   const denied = new Set<string>();
   try {
-    if (await insertNew(currentRows(), denied)) bump();
+    if (await insertNew(denied)) bump();
     const cur = currentRows();
-    const up = new Map<string, Row[]>(); // by collection, so a refusal in one does not block the others
-    const del: Row[] = [];
+    // Upserts by table, in collection order (masters first) so foreign keys are satisfied.
+    const up = new Map<string, PRow[]>();
+    const del: PRow[] = [];
     cur.forEach((r, k) => {
-      if (denied.has(r.collection)) return;
-      const s = stable(r.data);
-      if (saved.get(k) !== s) { if (!up.has(r.collection)) up.set(r.collection, []); up.get(r.collection)!.push({ ...r, data: JSON.parse(s) }); saved.set(k, s); }
+      if (denied.has(r.coll)) return;
+      const s = stable(r.row);
+      if (saved.get(k) !== s) {
+        if (!up.has(r.table)) up.set(r.table, []);
+        up.get(r.table)!.push(r);
+      }
     });
-    [...saved.keys()].forEach((k) => { if (!cur.has(k)) { const [collection, id] = k.split("\u0000"); if (!denied.has(collection)) { del.push({ collection, id, data: null }); saved.delete(k); } } });
-    for (const [coll, rows] of up) {
+    for (const [k, a] of savedAt)
+      if (!cur.has(k) && !denied.has(a.coll)) del.push({ ...a, rec: "", row: {} });
+    for (const [table, rows] of up) {
+      const coll = rows[0].coll;
+      if (denied.has(coll)) continue;
       try {
-        await upsertRows(rows);
+        await upsert(table, rows);
+        rows.forEach(setSaved);
       } catch (e) {
         if (!isDenied(e)) throw e;
         denied.add(coll);
       }
     }
+    // Line rows first, then whole records (deleting a header removes its lines too).
+    del.sort((a, b) => Number(a.header) - Number(b.header));
     for (const d of del) {
-      if (denied.has(d.collection)) continue;
-      // A refused delete removes nothing and reports no error, so ask for the deleted row back.
-      const { data, error } = await db().delete().eq("collection", d.collection).eq("id", d.id).select("id");
-      if (error && !isDenied(error)) throw error;
-      if (error) denied.add(d.collection);
-      else if (!data?.length) {
-        const { data: still } = await db().select("id").eq("collection", d.collection).eq("id", d.id);
-        if (still?.length) denied.add(d.collection); // still there: the delete was refused
+      if (denied.has(d.coll)) continue;
+      const k = rowKey(d.table, d.pk);
+      if (!saved.has(k)) continue; // already gone with its record
+      if (!(await remove(d.table, d.pk))) {
+        denied.add(d.coll);
+        continue;
+      }
+      delSaved(k);
+      if (d.header && !isList(collBy[d.coll])) {
+        // Its line rows went with it (ON DELETE CASCADE).
+        const t = tspec(collBy[d.coll]);
+        for (const [sk, a] of [...savedAt])
+          if (!a.header && a.coll === d.coll && a.pk[parentKey(t)] === d.pk[t.pk.column])
+            delSaved(sk);
       }
     }
+    await saveCounters();
     if (denied.size) await handleDenied(denied);
     if (up.size || del.length) SYNC.lastSaved = new Date();
     SYNC.error = "";
   } catch (e: any) {
     SYNC.error = e?.message || String(e);
     console.error("[MEK-SEL] could not save to the database:", e);
-    // Forget what failed so the next change retries it.
-    saved.clear();
-    (await fetchAll().catch(() => [])).filter((r) => collBy[r.collection]).forEach((r) => saved.set(keyOf(r), stable(r.data)));
-    notify("Could not save the last change to the database. It will be retried with your next change.");
+    // Forget what failed so the next change retries it: re-read what the database holds.
+    try {
+      const byTable = await fetchTables(ALL_TABLES);
+      saved.clear();
+      savedAt.clear();
+      for (const c of COLLS)
+        for (const r of assemble(c, byTable)) rowsOf(c, r.key, r.rec, r.o).forEach(setSaved);
+    } catch {
+      saved.clear();
+      savedAt.clear();
+    }
+    notify(
+      "Could not save the last change to the database. It will be retried with your next change.",
+    );
   } finally {
     flushing = false;
-    if (again) { again = false; schedule(); }
+    if (again) {
+      again = false;
+      schedule();
+    } else if (pendingRemote.size) setTimeout(pullRemote, 0);
   }
 }
 function schedule() {
@@ -372,40 +628,108 @@ function schedule() {
 }
 
 let notifier: (msg: string) => void = (m) => console.warn(m);
-export const setSyncNotifier = (fn: (msg: string) => void) => { notifier = fn; };
+export const setSyncNotifier = (fn: (msg: string) => void) => {
+  notifier = fn;
+};
 const notify = (m: string) => notifier(m);
+
+/* ---------------- Changes made by others (Realtime) ---------------- */
+const pendingRemote = new Set<string>(); // record keys to re-read
+let pullTimer: any = null;
+async function pullRemote() {
+  if (flushing || !pendingRemote.size) return;
+  const keys = [...pendingRemote];
+  pendingRemote.clear();
+  const byColl = new Map<string, string[]>();
+  keys.forEach((k) => {
+    const [c, id] = k.split("\u0000");
+    if (!byColl.has(c)) byColl.set(c, []);
+    byColl.get(c)!.push(id);
+  });
+  let changed = false;
+  try {
+    for (const [cn, ids] of byColl) {
+      const c = collBy[cn];
+      if (!c) continue;
+      const byTable: Record<string, Row[]> = {};
+      for (const x of tablesOf(c)) {
+        const col = isList(c) ? "code" : x.header ? tspec(c).pk.column : parentKey(tspec(c));
+        const { data, error } = await tbl(x.table).select("*").in(col, ids);
+        if (error) throw error;
+        byTable[x.table] = data || [];
+      }
+      const found = new Map(assemble(c, byTable).map((r) => [r.key, r]));
+      for (const id of ids) {
+        const r = found.get(id);
+        let mine = c.kind === "array" ? c.arr[findIndex(c, id)] : c.obj[id];
+        // Rows saved for this record, whatever it holds now.
+        const mySaved = [...savedAt]
+          .filter(([, a]) => recOfRow(a.table, a.pk) === recKey(cn, id))
+          .map(([k]) => k);
+        if (!r) {
+          // Deleted by someone else: drop it here too, unless it is a new local record not saved yet.
+          if (mine !== undefined && mySaved.length) {
+            removeRecord(c, id);
+            mySaved.forEach(delSaved);
+            changed = true;
+          }
+          continue;
+        }
+        if (NUMBERED[cn] && mine !== undefined && !mySaved.length) {
+          renumber(cn, mine, new Set([id])); // same number, saved first elsewhere: ours moves on
+          mine = undefined;
+          changed = true;
+        }
+        const theirs = rowsOf(c, id, r.rec, r.o);
+        const now = mine !== undefined ? rowsOf(c, id, mine, r.o) : [];
+        mySaved.forEach(delSaved);
+        theirs.forEach(setSaved);
+        if (
+          now.length === theirs.length &&
+          now.every((x, i) => stable(x.row) === stable(theirs[i].row))
+        )
+          continue; // already the same here
+        applyRecord(c, id, r.rec, r.o);
+        changed = true;
+      }
+    }
+  } catch (e) {
+    console.warn("[MEK-SEL] could not read a change made by someone else:", e);
+  }
+  if (changed) {
+    rebuildLookups();
+    bump();
+  }
+}
 
 function subscribeRemote() {
   (supabase as any)
-    .channel("erp-records")
-    .on("postgres_changes", { event: "*", schema: "public", table: TABLE }, (p: any) => {
-      if (p.eventType === "DELETE") {
-        const o = p.old || {};
-        if (!o.collection || !collBy[o.collection]) return;
-        if (!saved.has(keyOf(o))) return;
-        saved.delete(keyOf(o));
-        removeRow(o.collection, o.id);
-      } else {
-        const n = p.new as Row & { updated_by?: string };
-        if (!collBy[n.collection]) return;
-        if (NUMBERED[n.collection] && !saved.has(keyOf(n))) {
-          // Someone else saved this number while ours (same number) is still waiting to be saved.
-          const c = collBy[n.collection] as ArrColl;
-          const mine = c.arr.find((x, j) => recMeta(c, x, j).k === n.id);
-          if (mine) renumber(n.collection, mine, new Set([n.id]));
+    .channel("erp-tables")
+    .on("postgres_changes", { event: "*", schema: "public" }, (p: any) => {
+      const table = p.table as string;
+      const row = (p.eventType === "DELETE" ? p.old : p.new) || {};
+      if (table === COUNTERS_TABLE) {
+        if (p.eventType !== "DELETE") {
+          applyCounters([row]);
         }
-        if (typeof n.updated_by === "string" && n.updated_by.endsWith("|" + TAB)) return; // our own write
-        const s = stable(n.data);
-        if (saved.get(keyOf(n)) === s) return; // our own write coming back
-        saved.set(keyOf(n), s);
-        applyRow(n);
+        return;
       }
-      rebuildLookups();
-      bump();
+      if (
+        p.eventType !== "DELETE" &&
+        typeof row.updated_by === "string" &&
+        row.updated_by.endsWith("|" + TAB)
+      )
+        return; // our own write
+      const k = recOfRow(table, row);
+      if (!k) return;
+      pendingRemote.add(k);
+      clearTimeout(pullTimer);
+      pullTimer = setTimeout(pullRemote, 150);
     })
     .subscribe();
 }
 
+/* ---------------- Start-up ---------------- */
 let readyP: Promise<void> | null = null;
 /** Load the ERP data from the database once per page load; falls back to sample data offline. */
 export function ready(): Promise<void> {
@@ -413,9 +737,17 @@ export function ready(): Promise<void> {
   if (!readyP) readyP = start();
   return readyP;
 }
+async function loadEverything() {
+  const byTable = await fetchTables([COUNTERS_TABLE, ...ALL_TABLES]);
+  for (const c of COLLS) loadColl(c, byTable);
+  applyCounters(byTable[COUNTERS_TABLE] || []);
+  rebuildLookups();
+  markSaved();
+  return byTable;
+}
 async function start() {
   try {
-    // The records are only readable once signed in to Lovable Cloud.
+    // The tables are only readable once signed in to Lovable Cloud.
     const { data } = await supabase.auth.getSession();
     if (!data.session) {
       // Not signed in yet: work from the sample data, and load the database after sign-in.
@@ -424,17 +756,20 @@ async function start() {
       readyP = null;
       return;
     }
-    let rows = (await fetchAll()).filter((r) => collBy[r.collection]);
-    if (!rows.length) {
-      await upsertRows(SEED, 0); // first run: the sample data becomes the starting point
-      rows = SEED;
+    const { count, error } = await tbl("staff").select("id", { count: "exact", head: true });
+    if (error) throw error;
+    if (!count) {
+      // First run: the sample data becomes the starting point.
+      const { error: e2 } = await (supabase as any).rpc("erp_load_sample", {
+        payload: SEED,
+        wipe: false,
+      });
+      if (e2 && !/already has data/i.test(e2.message || "")) throw e2;
     }
-    loadAll(rows);
-    rows.forEach((r) => saved.set(keyOf(r), stable(r.data)));
+    await loadEverything();
     SYNC.status = "online";
     onChange(schedule);
     subscribeRemote();
-    schedule(); // push anything the stored data was missing (e.g. new sample collections)
   } catch (e: any) {
     SYNC.status = "offline";
     SYNC.error = e?.message || String(e);
@@ -443,9 +778,11 @@ async function start() {
   bump();
 }
 
-/** Administrator: wipe the database and start again from the sample data. */
+/** Administrator: empty the database and start again from the sample data. */
 export async function resetToSample() {
-  const { error } = await db().delete().neq("collection", "");
+  const { error } = await (supabase as any).rpc("erp_load_sample", { payload: SEED, wipe: true });
   if (error) throw error;
-  await upsertRows(SEED, 0);
 }
+
+/** Lists screen: the rows of LIST_DATA (re-exported so screens do not import the engine internals). */
+export { LIST_DATA };
