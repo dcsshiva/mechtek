@@ -69,6 +69,27 @@ export const setupDemoLogins = createServerFn({ method: "POST" }).handler(async 
   return { created };
 });
 
+/** The caller must be an active staff member whose role has full Staff master access. Returns all staff. */
+async function requireStaffAdmin(sb: any, claims: any) {
+  const callerId = claims?.app_metadata?.staff_id;
+  const [staff, roles] = await Promise.all([records(sb, "staff"), records(sb, "roles")]);
+  const caller = staff.find((x) => x.id === callerId);
+  const role = caller && roles.find((r) => r.id === caller.role);
+  if (!caller || !caller.active || role?.perms?.staff !== "full") throw new Error("Only an administrator with full Staff master access can change logins.");
+  return staff;
+}
+
+/** Administrator: last sign-in time of each staff login, by staff id. */
+export const loginActivity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const sb = await admin();
+    await requireStaffAdmin(sb, context.claims);
+    const out: Record<string, string | null> = {};
+    for (const u of await listLogins(sb)) if (u.app_metadata?.staff_id) out[u.app_metadata.staff_id] = u.last_sign_in_at || null;
+    return out;
+  });
+
 type SaveLogin = { staffId: string; username?: string; password?: string; active?: boolean; isNew?: boolean };
 /** Error message when a new staff member's id is already used by someone else. */
 export const STAFF_ID_TAKEN = "Staff id already in use.";
@@ -84,12 +105,7 @@ export const saveLogin = createServerFn({ method: "POST" })
   })
   .handler(async ({ data, context }) => {
     const sb = await admin();
-    // The caller must be an active staff member whose role has full Staff master access.
-    const callerId = (context.claims as any)?.app_metadata?.staff_id;
-    const [staff, roles] = await Promise.all([records(sb, "staff"), records(sb, "roles")]);
-    const caller = staff.find((x) => x.id === callerId);
-    const role = caller && roles.find((r) => r.id === caller.role);
-    if (!caller || !caller.active || role?.perms?.staff !== "full") throw new Error("Only an administrator with full Staff master access can change logins.");
+    const staff = await requireStaffAdmin(sb, context.claims);
 
     const logins = await listLogins(sb);
     const login = logins.find((u) => u.app_metadata?.staff_id === data.staffId);

@@ -65,8 +65,29 @@ closes `erp_records` to anonymous visitors and removes the passwords phase 2 sto
   function. It checks that the caller's role has full Staff master access. Deactivated staff cannot sign in.
 - Passwords are never stored in the staff records.
 - If Lovable Cloud cannot be reached, the demo logins are checked in the browser and the app works offline on sample data.
-- Module access is enforced by the app, not the database: any signed-in staff member can technically read or change any
-  ERP record through the API. Per-module database rules would be a later step.
+- Last sign-in times come from Lovable Cloud (`loginActivity`) and are shown in the Staff master; they are not stored in
+  the staff records.
+
+## Module rules (phase 4)
+
+Migration `supabase/migrations/20261001120000_meksel_erp_module_rules.sql` makes the database enforce the Role master,
+not just the app:
+
+- **Reading:** any active staff member can read every record. Screens such as the dashboard and material planning need
+  data from all modules.
+- **Changing** a collection (insert, update or delete) needs one of these:
+  - "full" access to one of the modules that work on that collection, or
+  - one of the approval rights listed for it.
+
+  The lists are in the table `public.erp_write_access`; to give a role more reach, edit a row there.
+  Because a single action touches several collections (a GRN changes stock, the PO and the gate pass), each list
+  names every module whose screens write that collection.
+- **Staff and roles** can only be changed by roles with full Staff master or Role master access, so nobody can raise
+  their own access.
+- **Empty store:** while the store is empty (first run, or after **Reset demo data**), signed-in staff may load the
+  sample data.
+- **Refusals:** the app already hides actions a role may not take. If a change is still refused, only that collection's
+  part is undone, the screen reloads it from the database, and the user is told what was not saved.
 
 The old SalonBook tables from earlier migrations are not used by MEK-SEL ERP.
 
