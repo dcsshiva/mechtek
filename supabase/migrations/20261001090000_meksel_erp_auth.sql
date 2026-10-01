@@ -1,4 +1,4 @@
--- MEK-SEL ERP: sign-in moves to Lovable Cloud (Supabase Auth).
+-- Selvantra Technologies: sign-in moves to Lovable Cloud (Supabase Auth).
 -- Staff now sign in with Auth accounts (created by the app's server functions), so the record
 -- store is closed to anonymous visitors: only signed-in staff can read or change ERP records.
 -- A staff login carries app_metadata.staff_id, which only the service role can set, so an

@@ -1,4 +1,4 @@
--- MEK-SEL ERP: module rules in the database.
+-- Selvantra Technologies: module rules in the database.
 -- Until now any signed-in staff member could change any ERP record through the API; only the app
 -- checked the Role master. From here the database checks it too:
 --

@@ -64,7 +64,7 @@ export function StaffPage() {
   };
   return (
     <>
-      <PageHead route="staff" title="Staff master" desc="Employees who can sign in to MEK-SEL ERP, with their department, role and login."
+      <PageHead route="staff" title="Staff master" desc="Employees who can sign in to Selvantra Technologies, with their department, role and login."
         actions={canEdit("staff") ? [
           ...(canEdit("roles") && SYNC.status === "online" ? [<button key="r" className="btn" onClick={resetData}>Reset demo data</button>] : []),
           <button key="n" className="btn primary" onClick={() => openModal(<StaffModal />)}>Add staff</button>,

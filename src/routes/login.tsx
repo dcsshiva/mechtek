@@ -10,7 +10,7 @@ export const Route = createFileRoute("/login")({
     await restoreSession();
     if (SESSION.user) throw redirect({ to: "/dashboard" });
   },
-  head: () => ({ meta: [{ title: "Sign in — MEK-SEL ERP" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Selvantra Technologies" }] }),
   component: LoginPage,
 });
 
@@ -39,7 +39,7 @@ function LoginPage() {
         <div className="brand-row">
           <img className="brand-logo lg" src="/mechtek-logo.png" alt="Mechtek" width={86} height={77} />
           <div>
-            <div className="brand-name">MEK-SEL ERP</div>
+            <div className="brand-name">Selvantra Technologies</div>
             <div className="small">for Mechtek, Bengaluru · Surpassing Expectations</div>
           </div>
         </div>

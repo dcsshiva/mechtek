@@ -1,4 +1,4 @@
--- MEK-SEL ERP record store (phase 2).
+-- Selvantra Technologies record store (phase 2).
 -- Every ERP record (customer, lead, quotation, order, PO, GRN, stock movement, staff, role, ...)
 -- is one row: the collection it belongs to, its id, and the record itself as JSON.
 -- The app loads all rows at start-up, saves each change, and listens for changes made by

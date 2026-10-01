@@ -5,7 +5,7 @@
 @custom-variant dark (&:is([data-theme="dark"] *));
 
 /*
- * MEK-SEL ERP design system — Mechtek brand (orange #FD9700, charcoal #333333).
+ * Selvantra Technologies design system — Mechtek brand (orange #FD9700, charcoal #333333).
  * Plain CSS classes below (.card, .btn, .pill, table.data …) are the app's component styles.
  * The @theme mapping lets Tailwind / shadcn utilities (bg-primary, text-muted-foreground …) use the same tokens.
  */
