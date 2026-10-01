@@ -60,7 +60,14 @@ const collBy = Object.fromEntries(COLLS.map((c) => [c.name, c]));
 // its position so lists come back in the same order. Both live beside the record, not inside it.
 const meta = new WeakMap<object, { k: string; o: number }>();
 const nextOrder: Record<string, number> = {};
-const newKey = () => (typeof globalThis.crypto?.randomUUID === "function" ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
+let keySeq = 0;
+const fallbackKey = () => Date.now().toString(36) + (keySeq++).toString(36) + Math.random().toString(36).slice(2);
+// Cloudflare Workers refuse crypto random values while a module loads (the server render imports
+// this file), so fall back there; server-made keys are never saved.
+const newKey = () => {
+  try { return typeof globalThis.crypto?.randomUUID === "function" ? crypto.randomUUID() : fallbackKey(); }
+  catch { return fallbackKey(); }
+};
 function recMeta(c: ArrColl, x: any, idx: number) {
   let m = meta.get(x);
   if (!m) {
