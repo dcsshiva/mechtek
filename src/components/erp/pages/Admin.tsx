@@ -8,6 +8,7 @@ import { bump, useErp } from "@/erp/store";
 import { Field, Modal, PageHead, Pill, Seg, closeModal, openModal, toast } from "../ui";
 import { allow } from "./proc";
 import { SYNC, resetToSample } from "@/erp/persist";
+import { runSetupCheck, type SetupReport } from "@/erp/setupcheck";
 
 /** Signed in with Lovable Cloud: logins are changed in Supabase Auth, not in the staff record. */
 const cloud = () => AUTH.mode === "cloud";
