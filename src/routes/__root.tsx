@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Selvantra Technologies: enquiry-to-dispatch ERP prototype for Mechtek's blister packing machines, de-foiling machines and change parts. Built by Selvantra Technologies.",
+          "Enquiry-to-dispatch ERP prototype for Mechtek's blister packing machines, de-foiling machines and change parts. Built by Selvantra Technologies.",
       },
       { name: "author", content: "Selvantra Technologies" },
       { property: "og:type", content: "website" },

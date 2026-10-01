@@ -131,7 +131,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="main" id="main">
           {children}
           <p className="footer-note">
-            Selvantra Technologies prototype · built by Selvantra Technologies for Mechtek · product names and specs from mechtek.in; BOMs,
+            ERP prototype built by Selvantra Technologies for Mechtek · product names and specs from mechtek.in; BOMs,
             rates, customers and transactions are sample data
           </p>
         </main>
