@@ -43,8 +43,6 @@ COMMENT ON COLUMN public.material_categories.name IS 'Category';
 COMMENT ON COLUMN public.material_categories.bin IS 'Store location';
 COMMENT ON COLUMN public.material_categories.lead_days IS 'Lead time (days)';
 COMMENT ON COLUMN public.material_categories.vendor_id IS 'Default vendor';
-DROP TRIGGER IF EXISTS erp_touch ON public.material_categories;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.material_categories FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.uoms (
   code text NOT NULL,
@@ -58,8 +56,6 @@ CREATE TABLE IF NOT EXISTS public.uoms (
 COMMENT ON TABLE public.uoms IS 'Stock units for raw materials.';
 COMMENT ON COLUMN public.uoms.code IS 'Code';
 COMMENT ON COLUMN public.uoms.name IS 'Unit';
-DROP TRIGGER IF EXISTS erp_touch ON public.uoms;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.uoms FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.lead_sources (
   code text NOT NULL,
@@ -73,8 +69,6 @@ CREATE TABLE IF NOT EXISTS public.lead_sources (
 COMMENT ON TABLE public.lead_sources IS 'Where enquiries come from.';
 COMMENT ON COLUMN public.lead_sources.code IS 'Code';
 COMMENT ON COLUMN public.lead_sources.name IS 'Source';
-DROP TRIGGER IF EXISTS erp_touch ON public.lead_sources;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.lead_sources FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.lead_stages (
   code text NOT NULL,
@@ -88,8 +82,6 @@ CREATE TABLE IF NOT EXISTS public.lead_stages (
 COMMENT ON TABLE public.lead_stages IS 'Stages on the lead board. New, Quoted, Won and Lost drive the workflow.';
 COMMENT ON COLUMN public.lead_stages.code IS 'Code';
 COMMENT ON COLUMN public.lead_stages.name IS 'Stage';
-DROP TRIGGER IF EXISTS erp_touch ON public.lead_stages;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.lead_stages FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.activity_types (
   code text NOT NULL,
@@ -103,8 +95,6 @@ CREATE TABLE IF NOT EXISTS public.activity_types (
 COMMENT ON TABLE public.activity_types IS 'Kinds of CRM activity.';
 COMMENT ON COLUMN public.activity_types.code IS 'Code';
 COMMENT ON COLUMN public.activity_types.name IS 'Activity type';
-DROP TRIGGER IF EXISTS erp_touch ON public.activity_types;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.activity_types FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.contact_roles (
   code text NOT NULL,
@@ -118,8 +108,6 @@ CREATE TABLE IF NOT EXISTS public.contact_roles (
 COMMENT ON TABLE public.contact_roles IS 'Role of a customer contact in buying.';
 COMMENT ON COLUMN public.contact_roles.code IS 'Code';
 COMMENT ON COLUMN public.contact_roles.name IS 'Contact role';
-DROP TRIGGER IF EXISTS erp_touch ON public.contact_roles;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.contact_roles FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.departments (
   code text NOT NULL,
@@ -133,8 +121,6 @@ CREATE TABLE IF NOT EXISTS public.departments (
 COMMENT ON TABLE public.departments IS 'Departments for staff and indents.';
 COMMENT ON COLUMN public.departments.code IS 'Code';
 COMMENT ON COLUMN public.departments.name IS 'Department';
-DROP TRIGGER IF EXISTS erp_touch ON public.departments;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.departments FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.designations (
   code text NOT NULL,
@@ -148,8 +134,6 @@ CREATE TABLE IF NOT EXISTS public.designations (
 COMMENT ON TABLE public.designations IS 'Job titles offered in the staff form.';
 COMMENT ON COLUMN public.designations.code IS 'Code';
 COMMENT ON COLUMN public.designations.name IS 'Designation';
-DROP TRIGGER IF EXISTS erp_touch ON public.designations;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.designations FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.states (
   code text NOT NULL,
@@ -165,8 +149,6 @@ COMMENT ON TABLE public.states IS 'Indian states with their GST state codes.';
 COMMENT ON COLUMN public.states.code IS 'Code';
 COMMENT ON COLUMN public.states.name IS 'State';
 COMMENT ON COLUMN public.states.gst_code IS 'GST code';
-DROP TRIGGER IF EXISTS erp_touch ON public.states;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.states FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.company (
   code text NOT NULL,
@@ -190,8 +172,6 @@ COMMENT ON COLUMN public.company.state IS 'State';
 COMMENT ON COLUMN public.company.state_code IS 'GST state code';
 COMMENT ON COLUMN public.company.gstin IS 'GSTIN';
 COMMENT ON COLUMN public.company.gst_rate IS 'GST rate (%)';
-DROP TRIGGER IF EXISTS erp_touch ON public.company;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.company FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.product_families (
   code text NOT NULL,
@@ -205,8 +185,6 @@ CREATE TABLE IF NOT EXISTS public.product_families (
 COMMENT ON TABLE public.product_families IS 'Families for finished goods and child items.';
 COMMENT ON COLUMN public.product_families.code IS 'Code';
 COMMENT ON COLUMN public.product_families.name IS 'Family';
-DROP TRIGGER IF EXISTS erp_touch ON public.product_families;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.product_families FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.bom_groups (
   code text NOT NULL,
@@ -220,8 +198,6 @@ CREATE TABLE IF NOT EXISTS public.bom_groups (
 COMMENT ON TABLE public.bom_groups IS 'Sub-assemblies used to group BOM lines.';
 COMMENT ON COLUMN public.bom_groups.code IS 'Code';
 COMMENT ON COLUMN public.bom_groups.name IS 'Group';
-DROP TRIGGER IF EXISTS erp_touch ON public.bom_groups;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.bom_groups FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.item_kinds (
   code text NOT NULL,
@@ -235,8 +211,6 @@ CREATE TABLE IF NOT EXISTS public.item_kinds (
 COMMENT ON TABLE public.item_kinds IS 'Kinds of sellable item. Machine and change part drive work orders.';
 COMMENT ON COLUMN public.item_kinds.code IS 'Code';
 COMMENT ON COLUMN public.item_kinds.name IS 'Label';
-DROP TRIGGER IF EXISTS erp_touch ON public.item_kinds;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.item_kinds FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.roles (
   id text NOT NULL,
@@ -250,8 +224,6 @@ CREATE TABLE IF NOT EXISTS public.roles (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.roles IS 'Role master: what each role may see, change and approve.';
-DROP TRIGGER IF EXISTS erp_touch ON public.roles;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.roles FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.role_permissions (
   role_id text NOT NULL,
@@ -265,8 +237,6 @@ CREATE TABLE IF NOT EXISTS public.role_permissions (
   FOREIGN KEY (role_id) REFERENCES public.roles (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.role_permissions IS 'Access per module: none, view or full.';
-DROP TRIGGER IF EXISTS erp_touch ON public.role_permissions;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.role_permissions FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.role_approvals (
   role_id text NOT NULL,
@@ -280,8 +250,6 @@ CREATE TABLE IF NOT EXISTS public.role_approvals (
   FOREIGN KEY (role_id) REFERENCES public.roles (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.role_approvals IS 'Approval rights of the role.';
-DROP TRIGGER IF EXISTS erp_touch ON public.role_approvals;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.role_approvals FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.staff (
   id text NOT NULL,
@@ -302,8 +270,6 @@ CREATE TABLE IF NOT EXISTS public.staff (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.staff IS 'Staff master. Logins are Lovable Cloud accounts linked by staff id.';
-DROP TRIGGER IF EXISTS erp_touch ON public.staff;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.staff FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.customers (
   id text NOT NULL,
@@ -323,8 +289,6 @@ CREATE TABLE IF NOT EXISTS public.customers (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.customers IS 'Customer master.';
-DROP TRIGGER IF EXISTS erp_touch ON public.customers;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.customers FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.customer_contacts (
   id text NOT NULL,
@@ -342,8 +306,6 @@ CREATE TABLE IF NOT EXISTS public.customer_contacts (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.customer_contacts IS 'People at each customer.';
-DROP TRIGGER IF EXISTS erp_touch ON public.customer_contacts;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.customer_contacts FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.leads (
   id text NOT NULL,
@@ -362,8 +324,6 @@ CREATE TABLE IF NOT EXISTS public.leads (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.leads IS 'Sales leads (enquiries).';
-DROP TRIGGER IF EXISTS erp_touch ON public.leads;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.leads FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.activities (
   id text NOT NULL,
@@ -387,8 +347,6 @@ CREATE TABLE IF NOT EXISTS public.activities (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.activities IS 'CRM activities: calls, visits, e-mails and open follow-ups.';
-DROP TRIGGER IF EXISTS erp_touch ON public.activities;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.activities FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.quotations (
   id text NOT NULL,
@@ -407,8 +365,6 @@ CREATE TABLE IF NOT EXISTS public.quotations (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.quotations IS 'Quotations with discount approval.';
-DROP TRIGGER IF EXISTS erp_touch ON public.quotations;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.quotations FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.quotation_lines (
   quotation_id text NOT NULL,
@@ -427,8 +383,6 @@ CREATE TABLE IF NOT EXISTS public.quotation_lines (
   FOREIGN KEY (quotation_id) REFERENCES public.quotations (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.quotation_lines IS 'Items quoted. Child items point to their main item with parent_line.';
-DROP TRIGGER IF EXISTS erp_touch ON public.quotation_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.quotation_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.quotation_history (
   quotation_id text NOT NULL,
@@ -446,8 +400,6 @@ CREATE TABLE IF NOT EXISTS public.quotation_history (
   FOREIGN KEY (quotation_id) REFERENCES public.quotations (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.quotation_history IS 'Approval trail of the quotation.';
-DROP TRIGGER IF EXISTS erp_touch ON public.quotation_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.quotation_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.sales_orders (
   id text NOT NULL,
@@ -471,8 +423,6 @@ CREATE TABLE IF NOT EXISTS public.sales_orders (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.sales_orders IS 'Sales orders from customer POs.';
-DROP TRIGGER IF EXISTS erp_touch ON public.sales_orders;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.sales_orders FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.sales_order_lines (
   sales_order_id text NOT NULL,
@@ -492,8 +442,6 @@ CREATE TABLE IF NOT EXISTS public.sales_order_lines (
   FOREIGN KEY (sales_order_id) REFERENCES public.sales_orders (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.sales_order_lines IS 'Items ordered and how many have been dispatched.';
-DROP TRIGGER IF EXISTS erp_touch ON public.sales_order_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.sales_order_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.sales_order_payments (
   sales_order_id text NOT NULL,
@@ -509,8 +457,6 @@ CREATE TABLE IF NOT EXISTS public.sales_order_payments (
   FOREIGN KEY (sales_order_id) REFERENCES public.sales_orders (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.sales_order_payments IS 'Advance payments received against the order.';
-DROP TRIGGER IF EXISTS erp_touch ON public.sales_order_payments;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.sales_order_payments FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.invoices (
   id text NOT NULL,
@@ -541,8 +487,6 @@ CREATE TABLE IF NOT EXISTS public.invoices (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.invoices IS 'GST tax invoices raised at dispatch.';
-DROP TRIGGER IF EXISTS erp_touch ON public.invoices;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.invoices FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.invoice_lines (
   invoice_id text NOT NULL,
@@ -563,8 +507,6 @@ CREATE TABLE IF NOT EXISTS public.invoice_lines (
   FOREIGN KEY (invoice_id) REFERENCES public.invoices (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.invoice_lines IS 'Invoiced items.';
-DROP TRIGGER IF EXISTS erp_touch ON public.invoice_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.invoice_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.invoice_payments (
   invoice_id text NOT NULL,
@@ -580,8 +522,6 @@ CREATE TABLE IF NOT EXISTS public.invoice_payments (
   FOREIGN KEY (invoice_id) REFERENCES public.invoices (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.invoice_payments IS 'Customer payments against the invoice.';
-DROP TRIGGER IF EXISTS erp_touch ON public.invoice_payments;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.invoice_payments FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.delivery_challans (
   id text NOT NULL,
@@ -600,8 +540,6 @@ CREATE TABLE IF NOT EXISTS public.delivery_challans (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.delivery_challans IS 'Delivery challans (dispatches).';
-DROP TRIGGER IF EXISTS erp_touch ON public.delivery_challans;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.delivery_challans FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.delivery_challan_lines (
   delivery_challan_id text NOT NULL,
@@ -616,8 +554,6 @@ CREATE TABLE IF NOT EXISTS public.delivery_challan_lines (
   FOREIGN KEY (delivery_challan_id) REFERENCES public.delivery_challans (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.delivery_challan_lines IS 'Items dispatched.';
-DROP TRIGGER IF EXISTS erp_touch ON public.delivery_challan_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.delivery_challan_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.installed_machines (
   serial_no text NOT NULL,
@@ -638,8 +574,6 @@ CREATE TABLE IF NOT EXISTS public.installed_machines (
   PRIMARY KEY (serial_no)
 );
 COMMENT ON TABLE public.installed_machines IS 'Machines installed at customers, with warranty and AMC.';
-DROP TRIGGER IF EXISTS erp_touch ON public.installed_machines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.installed_machines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.service_tickets (
   id text NOT NULL,
@@ -654,8 +588,6 @@ CREATE TABLE IF NOT EXISTS public.service_tickets (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.service_tickets IS 'Service calls on installed machines.';
-DROP TRIGGER IF EXISTS erp_touch ON public.service_tickets;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.service_tickets FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.products (
   code text NOT NULL,
@@ -674,8 +606,6 @@ CREATE TABLE IF NOT EXISTS public.products (
   PRIMARY KEY (code)
 );
 COMMENT ON TABLE public.products IS 'Finished goods: machines and change parts.';
-DROP TRIGGER IF EXISTS erp_touch ON public.products;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.products FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.product_specs (
   product_code text NOT NULL,
@@ -689,8 +619,6 @@ CREATE TABLE IF NOT EXISTS public.product_specs (
   FOREIGN KEY (product_code) REFERENCES public.products (code) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.product_specs IS 'Published specifications.';
-DROP TRIGGER IF EXISTS erp_touch ON public.product_specs;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.product_specs FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.child_items (
   code text NOT NULL,
@@ -709,8 +637,6 @@ CREATE TABLE IF NOT EXISTS public.child_items (
   PRIMARY KEY (code)
 );
 COMMENT ON TABLE public.child_items IS 'Spares, accessories, documents and services sold with a main item.';
-DROP TRIGGER IF EXISTS erp_touch ON public.child_items;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.child_items FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.child_item_specs (
   child_item_code text NOT NULL,
@@ -724,8 +650,6 @@ CREATE TABLE IF NOT EXISTS public.child_item_specs (
   FOREIGN KEY (child_item_code) REFERENCES public.child_items (code) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.child_item_specs IS 'Specifications.';
-DROP TRIGGER IF EXISTS erp_touch ON public.child_item_specs;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.child_item_specs FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.materials (
   code text NOT NULL,
@@ -747,8 +671,6 @@ CREATE TABLE IF NOT EXISTS public.materials (
   PRIMARY KEY (code)
 );
 COMMENT ON TABLE public.materials IS 'Raw material master with stock levels.';
-DROP TRIGGER IF EXISTS erp_touch ON public.materials;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.materials FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.material_units (
   material_code text NOT NULL,
@@ -762,8 +684,6 @@ CREATE TABLE IF NOT EXISTS public.material_units (
   FOREIGN KEY (material_code) REFERENCES public.materials (code) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.material_units IS 'Alternative units: 1 unit = factor × base unit.';
-DROP TRIGGER IF EXISTS erp_touch ON public.material_units;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.material_units FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.boms (
   product_code text NOT NULL,
@@ -773,8 +693,6 @@ CREATE TABLE IF NOT EXISTS public.boms (
   PRIMARY KEY (product_code)
 );
 COMMENT ON TABLE public.boms IS 'Bill of materials header (one per product).';
-DROP TRIGGER IF EXISTS erp_touch ON public.boms;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.boms FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.bom_lines (
   product_code text NOT NULL,
@@ -789,8 +707,6 @@ CREATE TABLE IF NOT EXISTS public.bom_lines (
   FOREIGN KEY (product_code) REFERENCES public.boms (product_code) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.bom_lines IS 'Material per sub-assembly for one product.';
-DROP TRIGGER IF EXISTS erp_touch ON public.bom_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.bom_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.bom_versions (
   product_code text NOT NULL,
@@ -806,8 +722,6 @@ CREATE TABLE IF NOT EXISTS public.bom_versions (
   PRIMARY KEY (product_code, line_no)
 );
 COMMENT ON TABLE public.bom_versions IS 'One row per BOM release.';
-DROP TRIGGER IF EXISTS erp_touch ON public.bom_versions;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.bom_versions FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.combo_sets (
   product_code text NOT NULL,
@@ -818,8 +732,6 @@ CREATE TABLE IF NOT EXISTS public.combo_sets (
   PRIMARY KEY (product_code)
 );
 COMMENT ON TABLE public.combo_sets IS 'Combo set: the standard and optional scope sold with a main item.';
-DROP TRIGGER IF EXISTS erp_touch ON public.combo_sets;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.combo_sets FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.combo_set_lines (
   product_code text NOT NULL,
@@ -836,8 +748,6 @@ CREATE TABLE IF NOT EXISTS public.combo_set_lines (
   FOREIGN KEY (product_code) REFERENCES public.combo_sets (product_code) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.combo_set_lines IS 'Child items of the set. 1 = yes, 0 = no.';
-DROP TRIGGER IF EXISTS erp_touch ON public.combo_set_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.combo_set_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.combo_set_history (
   product_code text NOT NULL,
@@ -852,8 +762,6 @@ CREATE TABLE IF NOT EXISTS public.combo_set_history (
   FOREIGN KEY (product_code) REFERENCES public.combo_sets (product_code) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.combo_set_history IS 'Changes to the set.';
-DROP TRIGGER IF EXISTS erp_touch ON public.combo_set_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.combo_set_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.work_orders (
   id text NOT NULL,
@@ -870,8 +778,6 @@ CREATE TABLE IF NOT EXISTS public.work_orders (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.work_orders IS 'Work orders for machines and change parts.';
-DROP TRIGGER IF EXISTS erp_touch ON public.work_orders;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.work_orders FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.vendors (
   id text NOT NULL,
@@ -894,8 +800,6 @@ CREATE TABLE IF NOT EXISTS public.vendors (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.vendors IS 'Vendor master.';
-DROP TRIGGER IF EXISTS erp_touch ON public.vendors;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.vendors FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.indents (
   id text NOT NULL,
@@ -913,8 +817,6 @@ CREATE TABLE IF NOT EXISTS public.indents (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.indents IS 'Purchase indents (requests to buy).';
-DROP TRIGGER IF EXISTS erp_touch ON public.indents;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.indents FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.indent_lines (
   indent_id text NOT NULL,
@@ -930,8 +832,6 @@ CREATE TABLE IF NOT EXISTS public.indent_lines (
   FOREIGN KEY (indent_id) REFERENCES public.indents (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.indent_lines IS 'Materials requested.';
-DROP TRIGGER IF EXISTS erp_touch ON public.indent_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.indent_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.indent_history (
   indent_id text NOT NULL,
@@ -949,8 +849,6 @@ CREATE TABLE IF NOT EXISTS public.indent_history (
   FOREIGN KEY (indent_id) REFERENCES public.indents (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.indent_history IS 'Approval trail of the indent.';
-DROP TRIGGER IF EXISTS erp_touch ON public.indent_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.indent_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.purchase_orders (
   id text NOT NULL,
@@ -967,8 +865,6 @@ CREATE TABLE IF NOT EXISTS public.purchase_orders (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.purchase_orders IS 'Purchase orders to vendors.';
-DROP TRIGGER IF EXISTS erp_touch ON public.purchase_orders;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.purchase_orders FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.purchase_order_lines (
   purchase_order_id text NOT NULL,
@@ -989,8 +885,6 @@ CREATE TABLE IF NOT EXISTS public.purchase_order_lines (
   FOREIGN KEY (purchase_order_id) REFERENCES public.purchase_orders (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.purchase_order_lines IS 'Materials ordered (qty and rate in stock units; order_* in the unit ordered).';
-DROP TRIGGER IF EXISTS erp_touch ON public.purchase_order_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.purchase_order_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.purchase_order_history (
   purchase_order_id text NOT NULL,
@@ -1008,8 +902,6 @@ CREATE TABLE IF NOT EXISTS public.purchase_order_history (
   FOREIGN KEY (purchase_order_id) REFERENCES public.purchase_orders (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.purchase_order_history IS 'Approval trail of the PO.';
-DROP TRIGGER IF EXISTS erp_touch ON public.purchase_order_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.purchase_order_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.gate_passes (
   id text NOT NULL,
@@ -1032,8 +924,6 @@ CREATE TABLE IF NOT EXISTS public.gate_passes (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.gate_passes IS 'Gate entries (in) and gate passes (out).';
-DROP TRIGGER IF EXISTS erp_touch ON public.gate_passes;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.gate_passes FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.gate_pass_lines (
   gate_pass_id text NOT NULL,
@@ -1053,8 +943,6 @@ CREATE TABLE IF NOT EXISTS public.gate_pass_lines (
   FOREIGN KEY (gate_pass_id) REFERENCES public.gate_passes (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.gate_pass_lines IS 'Material through the gate.';
-DROP TRIGGER IF EXISTS erp_touch ON public.gate_pass_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.gate_pass_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.gate_pass_history (
   gate_pass_id text NOT NULL,
@@ -1072,8 +960,6 @@ CREATE TABLE IF NOT EXISTS public.gate_pass_history (
   FOREIGN KEY (gate_pass_id) REFERENCES public.gate_passes (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.gate_pass_history IS 'Trail of the gate entry or pass.';
-DROP TRIGGER IF EXISTS erp_touch ON public.gate_pass_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.gate_pass_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.grns (
   id text NOT NULL,
@@ -1091,8 +977,6 @@ CREATE TABLE IF NOT EXISTS public.grns (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.grns IS 'Goods receipt notes with QC acceptance.';
-DROP TRIGGER IF EXISTS erp_touch ON public.grns;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.grns FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.grn_lines (
   grn_id text NOT NULL,
@@ -1115,8 +999,6 @@ CREATE TABLE IF NOT EXISTS public.grn_lines (
   FOREIGN KEY (grn_id) REFERENCES public.grns (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.grn_lines IS 'Material received and inspected.';
-DROP TRIGGER IF EXISTS erp_touch ON public.grn_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.grn_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.grn_history (
   grn_id text NOT NULL,
@@ -1134,8 +1016,6 @@ CREATE TABLE IF NOT EXISTS public.grn_history (
   FOREIGN KEY (grn_id) REFERENCES public.grns (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.grn_history IS 'QC trail of the GRN.';
-DROP TRIGGER IF EXISTS erp_touch ON public.grn_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.grn_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.vendor_bills (
   id text NOT NULL,
@@ -1155,8 +1035,6 @@ CREATE TABLE IF NOT EXISTS public.vendor_bills (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.vendor_bills IS 'Vendor bills with 3-way match.';
-DROP TRIGGER IF EXISTS erp_touch ON public.vendor_bills;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.vendor_bills FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.vendor_bill_lines (
   vendor_bill_id text NOT NULL,
@@ -1177,8 +1055,6 @@ CREATE TABLE IF NOT EXISTS public.vendor_bill_lines (
   FOREIGN KEY (vendor_bill_id) REFERENCES public.vendor_bills (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.vendor_bill_lines IS 'Billed materials.';
-DROP TRIGGER IF EXISTS erp_touch ON public.vendor_bill_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.vendor_bill_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.vendor_bill_payments (
   vendor_bill_id text NOT NULL,
@@ -1194,8 +1070,6 @@ CREATE TABLE IF NOT EXISTS public.vendor_bill_payments (
   FOREIGN KEY (vendor_bill_id) REFERENCES public.vendor_bills (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.vendor_bill_payments IS 'Payments to the vendor.';
-DROP TRIGGER IF EXISTS erp_touch ON public.vendor_bill_payments;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.vendor_bill_payments FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.vendor_bill_history (
   vendor_bill_id text NOT NULL,
@@ -1213,8 +1087,6 @@ CREATE TABLE IF NOT EXISTS public.vendor_bill_history (
   FOREIGN KEY (vendor_bill_id) REFERENCES public.vendor_bills (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.vendor_bill_history IS 'Trail of the bill.';
-DROP TRIGGER IF EXISTS erp_touch ON public.vendor_bill_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.vendor_bill_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.debit_notes (
   id text NOT NULL,
@@ -1232,8 +1104,6 @@ CREATE TABLE IF NOT EXISTS public.debit_notes (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.debit_notes IS 'Debit notes raised on vendors.';
-DROP TRIGGER IF EXISTS erp_touch ON public.debit_notes;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.debit_notes FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.material_requisitions (
   id text NOT NULL,
@@ -1250,8 +1120,6 @@ CREATE TABLE IF NOT EXISTS public.material_requisitions (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.material_requisitions IS 'Material requisitions from the shop floor.';
-DROP TRIGGER IF EXISTS erp_touch ON public.material_requisitions;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.material_requisitions FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.material_requisition_lines (
   material_requisition_id text NOT NULL,
@@ -1271,8 +1139,6 @@ CREATE TABLE IF NOT EXISTS public.material_requisition_lines (
   FOREIGN KEY (material_requisition_id) REFERENCES public.material_requisitions (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.material_requisition_lines IS 'Materials requested, approved, issued and confirmed.';
-DROP TRIGGER IF EXISTS erp_touch ON public.material_requisition_lines;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.material_requisition_lines FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.material_requisition_history (
   material_requisition_id text NOT NULL,
@@ -1290,8 +1156,6 @@ CREATE TABLE IF NOT EXISTS public.material_requisition_history (
   FOREIGN KEY (material_requisition_id) REFERENCES public.material_requisitions (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.material_requisition_history IS 'Approval and issue trail.';
-DROP TRIGGER IF EXISTS erp_touch ON public.material_requisition_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.material_requisition_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.stock_ledger (
   id text NOT NULL,
@@ -1311,8 +1175,6 @@ CREATE TABLE IF NOT EXISTS public.stock_ledger (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.stock_ledger IS 'Every stock movement with the running balance.';
-DROP TRIGGER IF EXISTS erp_touch ON public.stock_ledger;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.stock_ledger FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.stock_adjustments (
   id text NOT NULL,
@@ -1330,8 +1192,6 @@ CREATE TABLE IF NOT EXISTS public.stock_adjustments (
   PRIMARY KEY (id)
 );
 COMMENT ON TABLE public.stock_adjustments IS 'Stock adjustments after a physical count.';
-DROP TRIGGER IF EXISTS erp_touch ON public.stock_adjustments;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.stock_adjustments FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 CREATE TABLE IF NOT EXISTS public.stock_adjustment_history (
   stock_adjustment_id text NOT NULL,
@@ -1349,10 +1209,6 @@ CREATE TABLE IF NOT EXISTS public.stock_adjustment_history (
   FOREIGN KEY (stock_adjustment_id) REFERENCES public.stock_adjustments (id) ON DELETE CASCADE ON UPDATE CASCADE
 );
 COMMENT ON TABLE public.stock_adjustment_history IS 'Approval trail.';
-DROP TRIGGER IF EXISTS erp_touch ON public.stock_adjustment_history;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.stock_adjustment_history FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
-DROP TRIGGER IF EXISTS erp_touch ON public.doc_counters;
-CREATE TRIGGER erp_touch BEFORE UPDATE ON public.doc_counters FOR EACH ROW EXECUTE FUNCTION public.erp_touch();
 
 -- Documents point at customers, vendors and roles.
 ALTER TABLE public.customer_contacts DROP CONSTRAINT IF EXISTS customer_contacts_customer_id_fkey;
@@ -1472,1375 +1328,106 @@ REVOKE ALL ON FUNCTION public.erp_can_delete(text) FROM anon;
 INSERT INTO public.erp_write_access (collection, modules, approvals, any_staff, can_delete) VALUES ('doc_counters', '{}', '{}', true, false)
 ON CONFLICT (collection) DO UPDATE SET any_staff = true;
 
--- Row-level security, grants and Realtime for every table.
-ALTER TABLE public.doc_counters ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.doc_counters FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.doc_counters TO authenticated;
-GRANT ALL ON public.doc_counters TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.doc_counters;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.doc_counters;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.doc_counters;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.doc_counters;
-CREATE POLICY "ERP staff: read" ON public.doc_counters FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.doc_counters FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('doc_counters')));
-CREATE POLICY "ERP staff: update" ON public.doc_counters FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('doc_counters'))) WITH CHECK ((SELECT public.erp_can_write('doc_counters')));
-CREATE POLICY "ERP staff: delete" ON public.doc_counters FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('doc_counters')));
-ALTER TABLE public.doc_counters REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'doc_counters') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.doc_counters;
-  END IF;
-END $rt$;
-ALTER TABLE public.material_categories ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.material_categories FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.material_categories TO authenticated;
-GRANT ALL ON public.material_categories TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.material_categories;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.material_categories;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.material_categories;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.material_categories;
-CREATE POLICY "ERP staff: read" ON public.material_categories FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.material_categories FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('material_categories')));
-CREATE POLICY "ERP staff: update" ON public.material_categories FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('material_categories'))) WITH CHECK ((SELECT public.erp_can_write('material_categories')));
-CREATE POLICY "ERP staff: delete" ON public.material_categories FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('material_categories')));
-ALTER TABLE public.material_categories REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'material_categories') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.material_categories;
-  END IF;
-END $rt$;
-ALTER TABLE public.uoms ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.uoms FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.uoms TO authenticated;
-GRANT ALL ON public.uoms TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.uoms;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.uoms;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.uoms;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.uoms;
-CREATE POLICY "ERP staff: read" ON public.uoms FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.uoms FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('uoms')));
-CREATE POLICY "ERP staff: update" ON public.uoms FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('uoms'))) WITH CHECK ((SELECT public.erp_can_write('uoms')));
-CREATE POLICY "ERP staff: delete" ON public.uoms FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('uoms')));
-ALTER TABLE public.uoms REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'uoms') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.uoms;
-  END IF;
-END $rt$;
-ALTER TABLE public.lead_sources ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.lead_sources FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.lead_sources TO authenticated;
-GRANT ALL ON public.lead_sources TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.lead_sources;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.lead_sources;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.lead_sources;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.lead_sources;
-CREATE POLICY "ERP staff: read" ON public.lead_sources FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.lead_sources FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('lead_sources')));
-CREATE POLICY "ERP staff: update" ON public.lead_sources FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('lead_sources'))) WITH CHECK ((SELECT public.erp_can_write('lead_sources')));
-CREATE POLICY "ERP staff: delete" ON public.lead_sources FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('lead_sources')));
-ALTER TABLE public.lead_sources REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'lead_sources') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.lead_sources;
-  END IF;
-END $rt$;
-ALTER TABLE public.lead_stages ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.lead_stages FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.lead_stages TO authenticated;
-GRANT ALL ON public.lead_stages TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.lead_stages;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.lead_stages;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.lead_stages;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.lead_stages;
-CREATE POLICY "ERP staff: read" ON public.lead_stages FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.lead_stages FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('lead_stages')));
-CREATE POLICY "ERP staff: update" ON public.lead_stages FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('lead_stages'))) WITH CHECK ((SELECT public.erp_can_write('lead_stages')));
-CREATE POLICY "ERP staff: delete" ON public.lead_stages FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('lead_stages')));
-ALTER TABLE public.lead_stages REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'lead_stages') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.lead_stages;
-  END IF;
-END $rt$;
-ALTER TABLE public.activity_types ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.activity_types FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.activity_types TO authenticated;
-GRANT ALL ON public.activity_types TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.activity_types;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.activity_types;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.activity_types;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.activity_types;
-CREATE POLICY "ERP staff: read" ON public.activity_types FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.activity_types FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('activity_types')));
-CREATE POLICY "ERP staff: update" ON public.activity_types FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('activity_types'))) WITH CHECK ((SELECT public.erp_can_write('activity_types')));
-CREATE POLICY "ERP staff: delete" ON public.activity_types FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('activity_types')));
-ALTER TABLE public.activity_types REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'activity_types') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.activity_types;
-  END IF;
-END $rt$;
-ALTER TABLE public.contact_roles ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.contact_roles FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.contact_roles TO authenticated;
-GRANT ALL ON public.contact_roles TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.contact_roles;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.contact_roles;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.contact_roles;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.contact_roles;
-CREATE POLICY "ERP staff: read" ON public.contact_roles FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.contact_roles FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('contact_roles')));
-CREATE POLICY "ERP staff: update" ON public.contact_roles FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('contact_roles'))) WITH CHECK ((SELECT public.erp_can_write('contact_roles')));
-CREATE POLICY "ERP staff: delete" ON public.contact_roles FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('contact_roles')));
-ALTER TABLE public.contact_roles REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'contact_roles') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.contact_roles;
-  END IF;
-END $rt$;
-ALTER TABLE public.departments ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.departments FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.departments TO authenticated;
-GRANT ALL ON public.departments TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.departments;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.departments;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.departments;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.departments;
-CREATE POLICY "ERP staff: read" ON public.departments FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.departments FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('departments')));
-CREATE POLICY "ERP staff: update" ON public.departments FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('departments'))) WITH CHECK ((SELECT public.erp_can_write('departments')));
-CREATE POLICY "ERP staff: delete" ON public.departments FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('departments')));
-ALTER TABLE public.departments REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'departments') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.departments;
-  END IF;
-END $rt$;
-ALTER TABLE public.designations ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.designations FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.designations TO authenticated;
-GRANT ALL ON public.designations TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.designations;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.designations;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.designations;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.designations;
-CREATE POLICY "ERP staff: read" ON public.designations FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.designations FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('designations')));
-CREATE POLICY "ERP staff: update" ON public.designations FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('designations'))) WITH CHECK ((SELECT public.erp_can_write('designations')));
-CREATE POLICY "ERP staff: delete" ON public.designations FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('designations')));
-ALTER TABLE public.designations REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'designations') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.designations;
-  END IF;
-END $rt$;
-ALTER TABLE public.states ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.states FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.states TO authenticated;
-GRANT ALL ON public.states TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.states;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.states;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.states;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.states;
-CREATE POLICY "ERP staff: read" ON public.states FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.states FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('states')));
-CREATE POLICY "ERP staff: update" ON public.states FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('states'))) WITH CHECK ((SELECT public.erp_can_write('states')));
-CREATE POLICY "ERP staff: delete" ON public.states FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('states')));
-ALTER TABLE public.states REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'states') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.states;
-  END IF;
-END $rt$;
-ALTER TABLE public.company ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.company FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.company TO authenticated;
-GRANT ALL ON public.company TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.company;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.company;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.company;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.company;
-CREATE POLICY "ERP staff: read" ON public.company FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.company FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('company')));
-CREATE POLICY "ERP staff: update" ON public.company FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('company'))) WITH CHECK ((SELECT public.erp_can_write('company')));
-CREATE POLICY "ERP staff: delete" ON public.company FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('company')));
-ALTER TABLE public.company REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'company') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.company;
-  END IF;
-END $rt$;
-ALTER TABLE public.product_families ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.product_families FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_families TO authenticated;
-GRANT ALL ON public.product_families TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.product_families;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.product_families;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.product_families;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.product_families;
-CREATE POLICY "ERP staff: read" ON public.product_families FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.product_families FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('product_families')));
-CREATE POLICY "ERP staff: update" ON public.product_families FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('product_families'))) WITH CHECK ((SELECT public.erp_can_write('product_families')));
-CREATE POLICY "ERP staff: delete" ON public.product_families FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('product_families')));
-ALTER TABLE public.product_families REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'product_families') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.product_families;
-  END IF;
-END $rt$;
-ALTER TABLE public.bom_groups ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.bom_groups FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.bom_groups TO authenticated;
-GRANT ALL ON public.bom_groups TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.bom_groups;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.bom_groups;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.bom_groups;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.bom_groups;
-CREATE POLICY "ERP staff: read" ON public.bom_groups FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.bom_groups FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('bom_groups')));
-CREATE POLICY "ERP staff: update" ON public.bom_groups FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('bom_groups'))) WITH CHECK ((SELECT public.erp_can_write('bom_groups')));
-CREATE POLICY "ERP staff: delete" ON public.bom_groups FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('bom_groups')));
-ALTER TABLE public.bom_groups REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'bom_groups') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.bom_groups;
-  END IF;
-END $rt$;
-ALTER TABLE public.item_kinds ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.item_kinds FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.item_kinds TO authenticated;
-GRANT ALL ON public.item_kinds TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.item_kinds;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.item_kinds;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.item_kinds;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.item_kinds;
-CREATE POLICY "ERP staff: read" ON public.item_kinds FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.item_kinds FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('item_kinds')));
-CREATE POLICY "ERP staff: update" ON public.item_kinds FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('item_kinds'))) WITH CHECK ((SELECT public.erp_can_write('item_kinds')));
-CREATE POLICY "ERP staff: delete" ON public.item_kinds FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('item_kinds')));
-ALTER TABLE public.item_kinds REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'item_kinds') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.item_kinds;
-  END IF;
-END $rt$;
-ALTER TABLE public.roles ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.roles FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.roles TO authenticated;
-GRANT ALL ON public.roles TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.roles;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.roles;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.roles;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.roles;
-CREATE POLICY "ERP staff: read" ON public.roles FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.roles FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('roles')));
-CREATE POLICY "ERP staff: update" ON public.roles FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('roles'))) WITH CHECK ((SELECT public.erp_can_write('roles')));
-CREATE POLICY "ERP staff: delete" ON public.roles FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('roles')));
-ALTER TABLE public.roles REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'roles') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.roles;
-  END IF;
-END $rt$;
-ALTER TABLE public.role_permissions ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.role_permissions FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.role_permissions TO authenticated;
-GRANT ALL ON public.role_permissions TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.role_permissions;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.role_permissions;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.role_permissions;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.role_permissions;
-CREATE POLICY "ERP staff: read" ON public.role_permissions FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.role_permissions FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('roles')));
-CREATE POLICY "ERP staff: update" ON public.role_permissions FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('roles'))) WITH CHECK ((SELECT public.erp_can_write('roles')));
-CREATE POLICY "ERP staff: delete" ON public.role_permissions FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('roles')));
-ALTER TABLE public.role_permissions REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'role_permissions') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.role_permissions;
-  END IF;
-END $rt$;
-ALTER TABLE public.role_approvals ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.role_approvals FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.role_approvals TO authenticated;
-GRANT ALL ON public.role_approvals TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.role_approvals;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.role_approvals;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.role_approvals;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.role_approvals;
-CREATE POLICY "ERP staff: read" ON public.role_approvals FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.role_approvals FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('roles')));
-CREATE POLICY "ERP staff: update" ON public.role_approvals FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('roles'))) WITH CHECK ((SELECT public.erp_can_write('roles')));
-CREATE POLICY "ERP staff: delete" ON public.role_approvals FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('roles')));
-ALTER TABLE public.role_approvals REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'role_approvals') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.role_approvals;
-  END IF;
-END $rt$;
-ALTER TABLE public.staff ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.staff FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.staff TO authenticated;
-GRANT ALL ON public.staff TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.staff;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.staff;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.staff;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.staff;
-CREATE POLICY "ERP staff: read" ON public.staff FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.staff FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('staff')));
-CREATE POLICY "ERP staff: update" ON public.staff FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('staff'))) WITH CHECK ((SELECT public.erp_can_write('staff')));
-CREATE POLICY "ERP staff: delete" ON public.staff FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('staff')));
-ALTER TABLE public.staff REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'staff') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.staff;
-  END IF;
-END $rt$;
-ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.customers FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.customers TO authenticated;
-GRANT ALL ON public.customers TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.customers;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.customers;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.customers;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.customers;
-CREATE POLICY "ERP staff: read" ON public.customers FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.customers FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('customers')));
-CREATE POLICY "ERP staff: update" ON public.customers FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('customers'))) WITH CHECK ((SELECT public.erp_can_write('customers')));
-CREATE POLICY "ERP staff: delete" ON public.customers FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('customers')));
-ALTER TABLE public.customers REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'customers') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.customers;
-  END IF;
-END $rt$;
-ALTER TABLE public.customer_contacts ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.customer_contacts FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.customer_contacts TO authenticated;
-GRANT ALL ON public.customer_contacts TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.customer_contacts;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.customer_contacts;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.customer_contacts;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.customer_contacts;
-CREATE POLICY "ERP staff: read" ON public.customer_contacts FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.customer_contacts FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('contacts')));
-CREATE POLICY "ERP staff: update" ON public.customer_contacts FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('contacts'))) WITH CHECK ((SELECT public.erp_can_write('contacts')));
-CREATE POLICY "ERP staff: delete" ON public.customer_contacts FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('contacts')));
-ALTER TABLE public.customer_contacts REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'customer_contacts') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.customer_contacts;
-  END IF;
-END $rt$;
-ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.leads FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.leads TO authenticated;
-GRANT ALL ON public.leads TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.leads;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.leads;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.leads;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.leads;
-CREATE POLICY "ERP staff: read" ON public.leads FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.leads FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('leads')));
-CREATE POLICY "ERP staff: update" ON public.leads FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('leads'))) WITH CHECK ((SELECT public.erp_can_write('leads')));
-CREATE POLICY "ERP staff: delete" ON public.leads FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('leads')));
-ALTER TABLE public.leads REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'leads') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.leads;
-  END IF;
-END $rt$;
-ALTER TABLE public.activities ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.activities FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.activities TO authenticated;
-GRANT ALL ON public.activities TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.activities;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.activities;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.activities;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.activities;
-CREATE POLICY "ERP staff: read" ON public.activities FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.activities FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('activities')));
-CREATE POLICY "ERP staff: update" ON public.activities FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('activities'))) WITH CHECK ((SELECT public.erp_can_write('activities')));
-CREATE POLICY "ERP staff: delete" ON public.activities FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('activities')));
-ALTER TABLE public.activities REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'activities') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.activities;
-  END IF;
-END $rt$;
-ALTER TABLE public.quotations ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.quotations FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.quotations TO authenticated;
-GRANT ALL ON public.quotations TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.quotations;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.quotations;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.quotations;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.quotations;
-CREATE POLICY "ERP staff: read" ON public.quotations FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.quotations FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('quotations')));
-CREATE POLICY "ERP staff: update" ON public.quotations FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('quotations'))) WITH CHECK ((SELECT public.erp_can_write('quotations')));
-CREATE POLICY "ERP staff: delete" ON public.quotations FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('quotations')));
-ALTER TABLE public.quotations REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'quotations') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.quotations;
-  END IF;
-END $rt$;
-ALTER TABLE public.quotation_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.quotation_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.quotation_lines TO authenticated;
-GRANT ALL ON public.quotation_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.quotation_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.quotation_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.quotation_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.quotation_lines;
-CREATE POLICY "ERP staff: read" ON public.quotation_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.quotation_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('quotations')));
-CREATE POLICY "ERP staff: update" ON public.quotation_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('quotations'))) WITH CHECK ((SELECT public.erp_can_write('quotations')));
-CREATE POLICY "ERP staff: delete" ON public.quotation_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('quotations')));
-ALTER TABLE public.quotation_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'quotation_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.quotation_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.quotation_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.quotation_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.quotation_history TO authenticated;
-GRANT ALL ON public.quotation_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.quotation_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.quotation_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.quotation_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.quotation_history;
-CREATE POLICY "ERP staff: read" ON public.quotation_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.quotation_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('quotations')));
-CREATE POLICY "ERP staff: update" ON public.quotation_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('quotations'))) WITH CHECK ((SELECT public.erp_can_write('quotations')));
-CREATE POLICY "ERP staff: delete" ON public.quotation_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('quotations')));
-ALTER TABLE public.quotation_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'quotation_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.quotation_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.sales_orders ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.sales_orders FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_orders TO authenticated;
-GRANT ALL ON public.sales_orders TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.sales_orders;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.sales_orders;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.sales_orders;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.sales_orders;
-CREATE POLICY "ERP staff: read" ON public.sales_orders FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.sales_orders FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('sales_orders')));
-CREATE POLICY "ERP staff: update" ON public.sales_orders FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('sales_orders'))) WITH CHECK ((SELECT public.erp_can_write('sales_orders')));
-CREATE POLICY "ERP staff: delete" ON public.sales_orders FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('sales_orders')));
-ALTER TABLE public.sales_orders REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'sales_orders') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.sales_orders;
-  END IF;
-END $rt$;
-ALTER TABLE public.sales_order_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.sales_order_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_order_lines TO authenticated;
-GRANT ALL ON public.sales_order_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.sales_order_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.sales_order_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.sales_order_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.sales_order_lines;
-CREATE POLICY "ERP staff: read" ON public.sales_order_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.sales_order_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('sales_orders')));
-CREATE POLICY "ERP staff: update" ON public.sales_order_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('sales_orders'))) WITH CHECK ((SELECT public.erp_can_write('sales_orders')));
-CREATE POLICY "ERP staff: delete" ON public.sales_order_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('sales_orders')));
-ALTER TABLE public.sales_order_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'sales_order_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.sales_order_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.sales_order_payments ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.sales_order_payments FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.sales_order_payments TO authenticated;
-GRANT ALL ON public.sales_order_payments TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.sales_order_payments;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.sales_order_payments;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.sales_order_payments;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.sales_order_payments;
-CREATE POLICY "ERP staff: read" ON public.sales_order_payments FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.sales_order_payments FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('sales_orders')));
-CREATE POLICY "ERP staff: update" ON public.sales_order_payments FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('sales_orders'))) WITH CHECK ((SELECT public.erp_can_write('sales_orders')));
-CREATE POLICY "ERP staff: delete" ON public.sales_order_payments FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('sales_orders')));
-ALTER TABLE public.sales_order_payments REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'sales_order_payments') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.sales_order_payments;
-  END IF;
-END $rt$;
-ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.invoices FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.invoices TO authenticated;
-GRANT ALL ON public.invoices TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.invoices;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.invoices;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.invoices;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.invoices;
-CREATE POLICY "ERP staff: read" ON public.invoices FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.invoices FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('invoices')));
-CREATE POLICY "ERP staff: update" ON public.invoices FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('invoices'))) WITH CHECK ((SELECT public.erp_can_write('invoices')));
-CREATE POLICY "ERP staff: delete" ON public.invoices FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('invoices')));
-ALTER TABLE public.invoices REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'invoices') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.invoices;
-  END IF;
-END $rt$;
-ALTER TABLE public.invoice_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.invoice_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.invoice_lines TO authenticated;
-GRANT ALL ON public.invoice_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.invoice_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.invoice_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.invoice_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.invoice_lines;
-CREATE POLICY "ERP staff: read" ON public.invoice_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.invoice_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('invoices')));
-CREATE POLICY "ERP staff: update" ON public.invoice_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('invoices'))) WITH CHECK ((SELECT public.erp_can_write('invoices')));
-CREATE POLICY "ERP staff: delete" ON public.invoice_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('invoices')));
-ALTER TABLE public.invoice_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'invoice_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.invoice_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.invoice_payments ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.invoice_payments FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.invoice_payments TO authenticated;
-GRANT ALL ON public.invoice_payments TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.invoice_payments;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.invoice_payments;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.invoice_payments;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.invoice_payments;
-CREATE POLICY "ERP staff: read" ON public.invoice_payments FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.invoice_payments FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('invoices')));
-CREATE POLICY "ERP staff: update" ON public.invoice_payments FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('invoices'))) WITH CHECK ((SELECT public.erp_can_write('invoices')));
-CREATE POLICY "ERP staff: delete" ON public.invoice_payments FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('invoices')));
-ALTER TABLE public.invoice_payments REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'invoice_payments') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.invoice_payments;
-  END IF;
-END $rt$;
-ALTER TABLE public.delivery_challans ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.delivery_challans FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.delivery_challans TO authenticated;
-GRANT ALL ON public.delivery_challans TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.delivery_challans;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.delivery_challans;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.delivery_challans;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.delivery_challans;
-CREATE POLICY "ERP staff: read" ON public.delivery_challans FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.delivery_challans FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('delivery_challans')));
-CREATE POLICY "ERP staff: update" ON public.delivery_challans FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('delivery_challans'))) WITH CHECK ((SELECT public.erp_can_write('delivery_challans')));
-CREATE POLICY "ERP staff: delete" ON public.delivery_challans FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('delivery_challans')));
-ALTER TABLE public.delivery_challans REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'delivery_challans') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.delivery_challans;
-  END IF;
-END $rt$;
-ALTER TABLE public.delivery_challan_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.delivery_challan_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.delivery_challan_lines TO authenticated;
-GRANT ALL ON public.delivery_challan_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.delivery_challan_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.delivery_challan_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.delivery_challan_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.delivery_challan_lines;
-CREATE POLICY "ERP staff: read" ON public.delivery_challan_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.delivery_challan_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('delivery_challans')));
-CREATE POLICY "ERP staff: update" ON public.delivery_challan_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('delivery_challans'))) WITH CHECK ((SELECT public.erp_can_write('delivery_challans')));
-CREATE POLICY "ERP staff: delete" ON public.delivery_challan_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('delivery_challans')));
-ALTER TABLE public.delivery_challan_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'delivery_challan_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.delivery_challan_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.installed_machines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.installed_machines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.installed_machines TO authenticated;
-GRANT ALL ON public.installed_machines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.installed_machines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.installed_machines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.installed_machines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.installed_machines;
-CREATE POLICY "ERP staff: read" ON public.installed_machines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.installed_machines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('installed_base')));
-CREATE POLICY "ERP staff: update" ON public.installed_machines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('installed_base'))) WITH CHECK ((SELECT public.erp_can_write('installed_base')));
-CREATE POLICY "ERP staff: delete" ON public.installed_machines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('installed_base')));
-ALTER TABLE public.installed_machines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'installed_machines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.installed_machines;
-  END IF;
-END $rt$;
-ALTER TABLE public.service_tickets ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.service_tickets FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.service_tickets TO authenticated;
-GRANT ALL ON public.service_tickets TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.service_tickets;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.service_tickets;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.service_tickets;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.service_tickets;
-CREATE POLICY "ERP staff: read" ON public.service_tickets FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.service_tickets FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('service_tickets')));
-CREATE POLICY "ERP staff: update" ON public.service_tickets FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('service_tickets'))) WITH CHECK ((SELECT public.erp_can_write('service_tickets')));
-CREATE POLICY "ERP staff: delete" ON public.service_tickets FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('service_tickets')));
-ALTER TABLE public.service_tickets REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'service_tickets') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.service_tickets;
-  END IF;
-END $rt$;
-ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.products FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.products TO authenticated;
-GRANT ALL ON public.products TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.products;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.products;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.products;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.products;
-CREATE POLICY "ERP staff: read" ON public.products FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.products FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('products')));
-CREATE POLICY "ERP staff: update" ON public.products FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('products'))) WITH CHECK ((SELECT public.erp_can_write('products')));
-CREATE POLICY "ERP staff: delete" ON public.products FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('products')));
-ALTER TABLE public.products REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'products') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.products;
-  END IF;
-END $rt$;
-ALTER TABLE public.product_specs ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.product_specs FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.product_specs TO authenticated;
-GRANT ALL ON public.product_specs TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.product_specs;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.product_specs;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.product_specs;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.product_specs;
-CREATE POLICY "ERP staff: read" ON public.product_specs FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.product_specs FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('products')));
-CREATE POLICY "ERP staff: update" ON public.product_specs FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('products'))) WITH CHECK ((SELECT public.erp_can_write('products')));
-CREATE POLICY "ERP staff: delete" ON public.product_specs FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('products')));
-ALTER TABLE public.product_specs REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'product_specs') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.product_specs;
-  END IF;
-END $rt$;
-ALTER TABLE public.child_items ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.child_items FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.child_items TO authenticated;
-GRANT ALL ON public.child_items TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.child_items;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.child_items;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.child_items;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.child_items;
-CREATE POLICY "ERP staff: read" ON public.child_items FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.child_items FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('child_items')));
-CREATE POLICY "ERP staff: update" ON public.child_items FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('child_items'))) WITH CHECK ((SELECT public.erp_can_write('child_items')));
-CREATE POLICY "ERP staff: delete" ON public.child_items FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('child_items')));
-ALTER TABLE public.child_items REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'child_items') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.child_items;
-  END IF;
-END $rt$;
-ALTER TABLE public.child_item_specs ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.child_item_specs FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.child_item_specs TO authenticated;
-GRANT ALL ON public.child_item_specs TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.child_item_specs;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.child_item_specs;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.child_item_specs;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.child_item_specs;
-CREATE POLICY "ERP staff: read" ON public.child_item_specs FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.child_item_specs FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('child_items')));
-CREATE POLICY "ERP staff: update" ON public.child_item_specs FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('child_items'))) WITH CHECK ((SELECT public.erp_can_write('child_items')));
-CREATE POLICY "ERP staff: delete" ON public.child_item_specs FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('child_items')));
-ALTER TABLE public.child_item_specs REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'child_item_specs') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.child_item_specs;
-  END IF;
-END $rt$;
-ALTER TABLE public.materials ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.materials FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.materials TO authenticated;
-GRANT ALL ON public.materials TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.materials;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.materials;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.materials;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.materials;
-CREATE POLICY "ERP staff: read" ON public.materials FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.materials FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('materials')));
-CREATE POLICY "ERP staff: update" ON public.materials FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('materials'))) WITH CHECK ((SELECT public.erp_can_write('materials')));
-CREATE POLICY "ERP staff: delete" ON public.materials FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('materials')));
-ALTER TABLE public.materials REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'materials') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.materials;
-  END IF;
-END $rt$;
-ALTER TABLE public.material_units ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.material_units FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.material_units TO authenticated;
-GRANT ALL ON public.material_units TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.material_units;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.material_units;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.material_units;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.material_units;
-CREATE POLICY "ERP staff: read" ON public.material_units FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.material_units FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('materials')));
-CREATE POLICY "ERP staff: update" ON public.material_units FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('materials'))) WITH CHECK ((SELECT public.erp_can_write('materials')));
-CREATE POLICY "ERP staff: delete" ON public.material_units FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('materials')));
-ALTER TABLE public.material_units REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'material_units') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.material_units;
-  END IF;
-END $rt$;
-ALTER TABLE public.boms ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.boms FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.boms TO authenticated;
-GRANT ALL ON public.boms TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.boms;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.boms;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.boms;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.boms;
-CREATE POLICY "ERP staff: read" ON public.boms FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.boms FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('bom')));
-CREATE POLICY "ERP staff: update" ON public.boms FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('bom'))) WITH CHECK ((SELECT public.erp_can_write('bom')));
-CREATE POLICY "ERP staff: delete" ON public.boms FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('bom')));
-ALTER TABLE public.boms REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'boms') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.boms;
-  END IF;
-END $rt$;
-ALTER TABLE public.bom_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.bom_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.bom_lines TO authenticated;
-GRANT ALL ON public.bom_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.bom_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.bom_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.bom_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.bom_lines;
-CREATE POLICY "ERP staff: read" ON public.bom_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.bom_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('bom')));
-CREATE POLICY "ERP staff: update" ON public.bom_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('bom'))) WITH CHECK ((SELECT public.erp_can_write('bom')));
-CREATE POLICY "ERP staff: delete" ON public.bom_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('bom')));
-ALTER TABLE public.bom_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'bom_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.bom_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.bom_versions ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.bom_versions FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.bom_versions TO authenticated;
-GRANT ALL ON public.bom_versions TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.bom_versions;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.bom_versions;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.bom_versions;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.bom_versions;
-CREATE POLICY "ERP staff: read" ON public.bom_versions FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.bom_versions FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('bom_versions')));
-CREATE POLICY "ERP staff: update" ON public.bom_versions FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('bom_versions'))) WITH CHECK ((SELECT public.erp_can_write('bom_versions')));
-CREATE POLICY "ERP staff: delete" ON public.bom_versions FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('bom_versions')));
-ALTER TABLE public.bom_versions REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'bom_versions') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.bom_versions;
-  END IF;
-END $rt$;
-ALTER TABLE public.combo_sets ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.combo_sets FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.combo_sets TO authenticated;
-GRANT ALL ON public.combo_sets TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.combo_sets;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.combo_sets;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.combo_sets;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.combo_sets;
-CREATE POLICY "ERP staff: read" ON public.combo_sets FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.combo_sets FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('combos')));
-CREATE POLICY "ERP staff: update" ON public.combo_sets FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('combos'))) WITH CHECK ((SELECT public.erp_can_write('combos')));
-CREATE POLICY "ERP staff: delete" ON public.combo_sets FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('combos')));
-ALTER TABLE public.combo_sets REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'combo_sets') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.combo_sets;
-  END IF;
-END $rt$;
-ALTER TABLE public.combo_set_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.combo_set_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.combo_set_lines TO authenticated;
-GRANT ALL ON public.combo_set_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.combo_set_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.combo_set_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.combo_set_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.combo_set_lines;
-CREATE POLICY "ERP staff: read" ON public.combo_set_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.combo_set_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('combos')));
-CREATE POLICY "ERP staff: update" ON public.combo_set_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('combos'))) WITH CHECK ((SELECT public.erp_can_write('combos')));
-CREATE POLICY "ERP staff: delete" ON public.combo_set_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('combos')));
-ALTER TABLE public.combo_set_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'combo_set_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.combo_set_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.combo_set_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.combo_set_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.combo_set_history TO authenticated;
-GRANT ALL ON public.combo_set_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.combo_set_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.combo_set_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.combo_set_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.combo_set_history;
-CREATE POLICY "ERP staff: read" ON public.combo_set_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.combo_set_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('combos')));
-CREATE POLICY "ERP staff: update" ON public.combo_set_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('combos'))) WITH CHECK ((SELECT public.erp_can_write('combos')));
-CREATE POLICY "ERP staff: delete" ON public.combo_set_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('combos')));
-ALTER TABLE public.combo_set_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'combo_set_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.combo_set_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.work_orders ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.work_orders FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.work_orders TO authenticated;
-GRANT ALL ON public.work_orders TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.work_orders;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.work_orders;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.work_orders;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.work_orders;
-CREATE POLICY "ERP staff: read" ON public.work_orders FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.work_orders FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('work_orders')));
-CREATE POLICY "ERP staff: update" ON public.work_orders FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('work_orders'))) WITH CHECK ((SELECT public.erp_can_write('work_orders')));
-CREATE POLICY "ERP staff: delete" ON public.work_orders FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('work_orders')));
-ALTER TABLE public.work_orders REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'work_orders') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.work_orders;
-  END IF;
-END $rt$;
-ALTER TABLE public.vendors ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.vendors FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.vendors TO authenticated;
-GRANT ALL ON public.vendors TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.vendors;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.vendors;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.vendors;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.vendors;
-CREATE POLICY "ERP staff: read" ON public.vendors FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.vendors FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('vendors')));
-CREATE POLICY "ERP staff: update" ON public.vendors FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('vendors'))) WITH CHECK ((SELECT public.erp_can_write('vendors')));
-CREATE POLICY "ERP staff: delete" ON public.vendors FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('vendors')));
-ALTER TABLE public.vendors REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'vendors') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.vendors;
-  END IF;
-END $rt$;
-ALTER TABLE public.indents ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.indents FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.indents TO authenticated;
-GRANT ALL ON public.indents TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.indents;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.indents;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.indents;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.indents;
-CREATE POLICY "ERP staff: read" ON public.indents FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.indents FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('indents')));
-CREATE POLICY "ERP staff: update" ON public.indents FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('indents'))) WITH CHECK ((SELECT public.erp_can_write('indents')));
-CREATE POLICY "ERP staff: delete" ON public.indents FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('indents')));
-ALTER TABLE public.indents REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'indents') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.indents;
-  END IF;
-END $rt$;
-ALTER TABLE public.indent_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.indent_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.indent_lines TO authenticated;
-GRANT ALL ON public.indent_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.indent_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.indent_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.indent_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.indent_lines;
-CREATE POLICY "ERP staff: read" ON public.indent_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.indent_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('indents')));
-CREATE POLICY "ERP staff: update" ON public.indent_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('indents'))) WITH CHECK ((SELECT public.erp_can_write('indents')));
-CREATE POLICY "ERP staff: delete" ON public.indent_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('indents')));
-ALTER TABLE public.indent_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'indent_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.indent_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.indent_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.indent_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.indent_history TO authenticated;
-GRANT ALL ON public.indent_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.indent_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.indent_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.indent_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.indent_history;
-CREATE POLICY "ERP staff: read" ON public.indent_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.indent_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('indents')));
-CREATE POLICY "ERP staff: update" ON public.indent_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('indents'))) WITH CHECK ((SELECT public.erp_can_write('indents')));
-CREATE POLICY "ERP staff: delete" ON public.indent_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('indents')));
-ALTER TABLE public.indent_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'indent_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.indent_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.purchase_orders ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.purchase_orders FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.purchase_orders TO authenticated;
-GRANT ALL ON public.purchase_orders TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.purchase_orders;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.purchase_orders;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.purchase_orders;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.purchase_orders;
-CREATE POLICY "ERP staff: read" ON public.purchase_orders FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.purchase_orders FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('purchase_orders')));
-CREATE POLICY "ERP staff: update" ON public.purchase_orders FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('purchase_orders'))) WITH CHECK ((SELECT public.erp_can_write('purchase_orders')));
-CREATE POLICY "ERP staff: delete" ON public.purchase_orders FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('purchase_orders')));
-ALTER TABLE public.purchase_orders REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'purchase_orders') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.purchase_orders;
-  END IF;
-END $rt$;
-ALTER TABLE public.purchase_order_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.purchase_order_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.purchase_order_lines TO authenticated;
-GRANT ALL ON public.purchase_order_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.purchase_order_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.purchase_order_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.purchase_order_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.purchase_order_lines;
-CREATE POLICY "ERP staff: read" ON public.purchase_order_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.purchase_order_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('purchase_orders')));
-CREATE POLICY "ERP staff: update" ON public.purchase_order_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('purchase_orders'))) WITH CHECK ((SELECT public.erp_can_write('purchase_orders')));
-CREATE POLICY "ERP staff: delete" ON public.purchase_order_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('purchase_orders')));
-ALTER TABLE public.purchase_order_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'purchase_order_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.purchase_order_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.purchase_order_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.purchase_order_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.purchase_order_history TO authenticated;
-GRANT ALL ON public.purchase_order_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.purchase_order_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.purchase_order_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.purchase_order_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.purchase_order_history;
-CREATE POLICY "ERP staff: read" ON public.purchase_order_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.purchase_order_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('purchase_orders')));
-CREATE POLICY "ERP staff: update" ON public.purchase_order_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('purchase_orders'))) WITH CHECK ((SELECT public.erp_can_write('purchase_orders')));
-CREATE POLICY "ERP staff: delete" ON public.purchase_order_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('purchase_orders')));
-ALTER TABLE public.purchase_order_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'purchase_order_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.purchase_order_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.gate_passes ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.gate_passes FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.gate_passes TO authenticated;
-GRANT ALL ON public.gate_passes TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.gate_passes;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.gate_passes;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.gate_passes;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.gate_passes;
-CREATE POLICY "ERP staff: read" ON public.gate_passes FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.gate_passes FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('gate_passes')));
-CREATE POLICY "ERP staff: update" ON public.gate_passes FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('gate_passes'))) WITH CHECK ((SELECT public.erp_can_write('gate_passes')));
-CREATE POLICY "ERP staff: delete" ON public.gate_passes FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('gate_passes')));
-ALTER TABLE public.gate_passes REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'gate_passes') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.gate_passes;
-  END IF;
-END $rt$;
-ALTER TABLE public.gate_pass_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.gate_pass_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.gate_pass_lines TO authenticated;
-GRANT ALL ON public.gate_pass_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.gate_pass_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.gate_pass_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.gate_pass_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.gate_pass_lines;
-CREATE POLICY "ERP staff: read" ON public.gate_pass_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.gate_pass_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('gate_passes')));
-CREATE POLICY "ERP staff: update" ON public.gate_pass_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('gate_passes'))) WITH CHECK ((SELECT public.erp_can_write('gate_passes')));
-CREATE POLICY "ERP staff: delete" ON public.gate_pass_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('gate_passes')));
-ALTER TABLE public.gate_pass_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'gate_pass_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.gate_pass_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.gate_pass_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.gate_pass_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.gate_pass_history TO authenticated;
-GRANT ALL ON public.gate_pass_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.gate_pass_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.gate_pass_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.gate_pass_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.gate_pass_history;
-CREATE POLICY "ERP staff: read" ON public.gate_pass_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.gate_pass_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('gate_passes')));
-CREATE POLICY "ERP staff: update" ON public.gate_pass_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('gate_passes'))) WITH CHECK ((SELECT public.erp_can_write('gate_passes')));
-CREATE POLICY "ERP staff: delete" ON public.gate_pass_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('gate_passes')));
-ALTER TABLE public.gate_pass_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'gate_pass_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.gate_pass_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.grns ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.grns FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.grns TO authenticated;
-GRANT ALL ON public.grns TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.grns;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.grns;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.grns;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.grns;
-CREATE POLICY "ERP staff: read" ON public.grns FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.grns FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('grns')));
-CREATE POLICY "ERP staff: update" ON public.grns FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('grns'))) WITH CHECK ((SELECT public.erp_can_write('grns')));
-CREATE POLICY "ERP staff: delete" ON public.grns FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('grns')));
-ALTER TABLE public.grns REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'grns') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.grns;
-  END IF;
-END $rt$;
-ALTER TABLE public.grn_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.grn_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.grn_lines TO authenticated;
-GRANT ALL ON public.grn_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.grn_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.grn_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.grn_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.grn_lines;
-CREATE POLICY "ERP staff: read" ON public.grn_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.grn_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('grns')));
-CREATE POLICY "ERP staff: update" ON public.grn_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('grns'))) WITH CHECK ((SELECT public.erp_can_write('grns')));
-CREATE POLICY "ERP staff: delete" ON public.grn_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('grns')));
-ALTER TABLE public.grn_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'grn_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.grn_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.grn_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.grn_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.grn_history TO authenticated;
-GRANT ALL ON public.grn_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.grn_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.grn_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.grn_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.grn_history;
-CREATE POLICY "ERP staff: read" ON public.grn_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.grn_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('grns')));
-CREATE POLICY "ERP staff: update" ON public.grn_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('grns'))) WITH CHECK ((SELECT public.erp_can_write('grns')));
-CREATE POLICY "ERP staff: delete" ON public.grn_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('grns')));
-ALTER TABLE public.grn_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'grn_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.grn_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.vendor_bills ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.vendor_bills FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.vendor_bills TO authenticated;
-GRANT ALL ON public.vendor_bills TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.vendor_bills;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.vendor_bills;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.vendor_bills;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.vendor_bills;
-CREATE POLICY "ERP staff: read" ON public.vendor_bills FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.vendor_bills FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: update" ON public.vendor_bills FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('vendor_bills'))) WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: delete" ON public.vendor_bills FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('vendor_bills')));
-ALTER TABLE public.vendor_bills REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'vendor_bills') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.vendor_bills;
-  END IF;
-END $rt$;
-ALTER TABLE public.vendor_bill_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.vendor_bill_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.vendor_bill_lines TO authenticated;
-GRANT ALL ON public.vendor_bill_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.vendor_bill_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.vendor_bill_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.vendor_bill_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.vendor_bill_lines;
-CREATE POLICY "ERP staff: read" ON public.vendor_bill_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.vendor_bill_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: update" ON public.vendor_bill_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('vendor_bills'))) WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: delete" ON public.vendor_bill_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('vendor_bills')));
-ALTER TABLE public.vendor_bill_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'vendor_bill_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.vendor_bill_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.vendor_bill_payments ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.vendor_bill_payments FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.vendor_bill_payments TO authenticated;
-GRANT ALL ON public.vendor_bill_payments TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.vendor_bill_payments;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.vendor_bill_payments;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.vendor_bill_payments;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.vendor_bill_payments;
-CREATE POLICY "ERP staff: read" ON public.vendor_bill_payments FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.vendor_bill_payments FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: update" ON public.vendor_bill_payments FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('vendor_bills'))) WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: delete" ON public.vendor_bill_payments FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('vendor_bills')));
-ALTER TABLE public.vendor_bill_payments REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'vendor_bill_payments') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.vendor_bill_payments;
-  END IF;
-END $rt$;
-ALTER TABLE public.vendor_bill_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.vendor_bill_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.vendor_bill_history TO authenticated;
-GRANT ALL ON public.vendor_bill_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.vendor_bill_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.vendor_bill_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.vendor_bill_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.vendor_bill_history;
-CREATE POLICY "ERP staff: read" ON public.vendor_bill_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.vendor_bill_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: update" ON public.vendor_bill_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('vendor_bills'))) WITH CHECK ((SELECT public.erp_can_write('vendor_bills')));
-CREATE POLICY "ERP staff: delete" ON public.vendor_bill_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('vendor_bills')));
-ALTER TABLE public.vendor_bill_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'vendor_bill_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.vendor_bill_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.debit_notes ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.debit_notes FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.debit_notes TO authenticated;
-GRANT ALL ON public.debit_notes TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.debit_notes;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.debit_notes;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.debit_notes;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.debit_notes;
-CREATE POLICY "ERP staff: read" ON public.debit_notes FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.debit_notes FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('debit_notes')));
-CREATE POLICY "ERP staff: update" ON public.debit_notes FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('debit_notes'))) WITH CHECK ((SELECT public.erp_can_write('debit_notes')));
-CREATE POLICY "ERP staff: delete" ON public.debit_notes FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('debit_notes')));
-ALTER TABLE public.debit_notes REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'debit_notes') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.debit_notes;
-  END IF;
-END $rt$;
-ALTER TABLE public.material_requisitions ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.material_requisitions FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.material_requisitions TO authenticated;
-GRANT ALL ON public.material_requisitions TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.material_requisitions;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.material_requisitions;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.material_requisitions;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.material_requisitions;
-CREATE POLICY "ERP staff: read" ON public.material_requisitions FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.material_requisitions FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('requisitions')));
-CREATE POLICY "ERP staff: update" ON public.material_requisitions FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('requisitions'))) WITH CHECK ((SELECT public.erp_can_write('requisitions')));
-CREATE POLICY "ERP staff: delete" ON public.material_requisitions FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('requisitions')));
-ALTER TABLE public.material_requisitions REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'material_requisitions') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.material_requisitions;
-  END IF;
-END $rt$;
-ALTER TABLE public.material_requisition_lines ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.material_requisition_lines FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.material_requisition_lines TO authenticated;
-GRANT ALL ON public.material_requisition_lines TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.material_requisition_lines;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.material_requisition_lines;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.material_requisition_lines;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.material_requisition_lines;
-CREATE POLICY "ERP staff: read" ON public.material_requisition_lines FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.material_requisition_lines FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('requisitions')));
-CREATE POLICY "ERP staff: update" ON public.material_requisition_lines FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('requisitions'))) WITH CHECK ((SELECT public.erp_can_write('requisitions')));
-CREATE POLICY "ERP staff: delete" ON public.material_requisition_lines FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('requisitions')));
-ALTER TABLE public.material_requisition_lines REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'material_requisition_lines') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.material_requisition_lines;
-  END IF;
-END $rt$;
-ALTER TABLE public.material_requisition_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.material_requisition_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.material_requisition_history TO authenticated;
-GRANT ALL ON public.material_requisition_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.material_requisition_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.material_requisition_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.material_requisition_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.material_requisition_history;
-CREATE POLICY "ERP staff: read" ON public.material_requisition_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.material_requisition_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('requisitions')));
-CREATE POLICY "ERP staff: update" ON public.material_requisition_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('requisitions'))) WITH CHECK ((SELECT public.erp_can_write('requisitions')));
-CREATE POLICY "ERP staff: delete" ON public.material_requisition_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('requisitions')));
-ALTER TABLE public.material_requisition_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'material_requisition_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.material_requisition_history;
-  END IF;
-END $rt$;
-ALTER TABLE public.stock_ledger ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.stock_ledger FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.stock_ledger TO authenticated;
-GRANT ALL ON public.stock_ledger TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.stock_ledger;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.stock_ledger;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.stock_ledger;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.stock_ledger;
-CREATE POLICY "ERP staff: read" ON public.stock_ledger FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.stock_ledger FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('stock_ledger')));
-CREATE POLICY "ERP staff: update" ON public.stock_ledger FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('stock_ledger'))) WITH CHECK ((SELECT public.erp_can_write('stock_ledger')));
-CREATE POLICY "ERP staff: delete" ON public.stock_ledger FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('stock_ledger')));
-ALTER TABLE public.stock_ledger REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'stock_ledger') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.stock_ledger;
-  END IF;
-END $rt$;
-ALTER TABLE public.stock_adjustments ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.stock_adjustments FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.stock_adjustments TO authenticated;
-GRANT ALL ON public.stock_adjustments TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.stock_adjustments;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.stock_adjustments;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.stock_adjustments;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.stock_adjustments;
-CREATE POLICY "ERP staff: read" ON public.stock_adjustments FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.stock_adjustments FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('stock_adjustments')));
-CREATE POLICY "ERP staff: update" ON public.stock_adjustments FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('stock_adjustments'))) WITH CHECK ((SELECT public.erp_can_write('stock_adjustments')));
-CREATE POLICY "ERP staff: delete" ON public.stock_adjustments FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('stock_adjustments')));
-ALTER TABLE public.stock_adjustments REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'stock_adjustments') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.stock_adjustments;
-  END IF;
-END $rt$;
-ALTER TABLE public.stock_adjustment_history ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.stock_adjustment_history FROM anon;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.stock_adjustment_history TO authenticated;
-GRANT ALL ON public.stock_adjustment_history TO service_role;
-DROP POLICY IF EXISTS "ERP staff: read" ON public.stock_adjustment_history;
-DROP POLICY IF EXISTS "ERP staff: insert" ON public.stock_adjustment_history;
-DROP POLICY IF EXISTS "ERP staff: update" ON public.stock_adjustment_history;
-DROP POLICY IF EXISTS "ERP staff: delete" ON public.stock_adjustment_history;
-CREATE POLICY "ERP staff: read" ON public.stock_adjustment_history FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()));
-CREATE POLICY "ERP staff: insert" ON public.stock_adjustment_history FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write('stock_adjustments')));
-CREATE POLICY "ERP staff: update" ON public.stock_adjustment_history FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write('stock_adjustments'))) WITH CHECK ((SELECT public.erp_can_write('stock_adjustments')));
-CREATE POLICY "ERP staff: delete" ON public.stock_adjustment_history FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete('stock_adjustments')));
-ALTER TABLE public.stock_adjustment_history REPLICA IDENTITY FULL;
-DO $rt$ BEGIN
-  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
-     AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'stock_adjustment_history') THEN
-    ALTER PUBLICATION supabase_realtime ADD TABLE public.stock_adjustment_history;
-  END IF;
-END $rt$;
+-- Row-level security, grants, the updated_at trigger and Realtime for every table.
+-- Each table is checked against the module rule of its collection (column 2).
+DO $sec$
+DECLARE t text; c text;
+BEGIN
+  FOR t, c IN SELECT * FROM (VALUES
+    ('doc_counters', 'doc_counters'),
+    ('material_categories', 'material_categories'),
+    ('uoms', 'uoms'),
+    ('lead_sources', 'lead_sources'),
+    ('lead_stages', 'lead_stages'),
+    ('activity_types', 'activity_types'),
+    ('contact_roles', 'contact_roles'),
+    ('departments', 'departments'),
+    ('designations', 'designations'),
+    ('states', 'states'),
+    ('company', 'company'),
+    ('product_families', 'product_families'),
+    ('bom_groups', 'bom_groups'),
+    ('item_kinds', 'item_kinds'),
+    ('roles', 'roles'),
+    ('role_permissions', 'roles'),
+    ('role_approvals', 'roles'),
+    ('staff', 'staff'),
+    ('customers', 'customers'),
+    ('customer_contacts', 'contacts'),
+    ('leads', 'leads'),
+    ('activities', 'activities'),
+    ('quotations', 'quotations'),
+    ('quotation_lines', 'quotations'),
+    ('quotation_history', 'quotations'),
+    ('sales_orders', 'sales_orders'),
+    ('sales_order_lines', 'sales_orders'),
+    ('sales_order_payments', 'sales_orders'),
+    ('invoices', 'invoices'),
+    ('invoice_lines', 'invoices'),
+    ('invoice_payments', 'invoices'),
+    ('delivery_challans', 'delivery_challans'),
+    ('delivery_challan_lines', 'delivery_challans'),
+    ('installed_machines', 'installed_base'),
+    ('service_tickets', 'service_tickets'),
+    ('products', 'products'),
+    ('product_specs', 'products'),
+    ('child_items', 'child_items'),
+    ('child_item_specs', 'child_items'),
+    ('materials', 'materials'),
+    ('material_units', 'materials'),
+    ('boms', 'bom'),
+    ('bom_lines', 'bom'),
+    ('bom_versions', 'bom_versions'),
+    ('combo_sets', 'combos'),
+    ('combo_set_lines', 'combos'),
+    ('combo_set_history', 'combos'),
+    ('work_orders', 'work_orders'),
+    ('vendors', 'vendors'),
+    ('indents', 'indents'),
+    ('indent_lines', 'indents'),
+    ('indent_history', 'indents'),
+    ('purchase_orders', 'purchase_orders'),
+    ('purchase_order_lines', 'purchase_orders'),
+    ('purchase_order_history', 'purchase_orders'),
+    ('gate_passes', 'gate_passes'),
+    ('gate_pass_lines', 'gate_passes'),
+    ('gate_pass_history', 'gate_passes'),
+    ('grns', 'grns'),
+    ('grn_lines', 'grns'),
+    ('grn_history', 'grns'),
+    ('vendor_bills', 'vendor_bills'),
+    ('vendor_bill_lines', 'vendor_bills'),
+    ('vendor_bill_payments', 'vendor_bills'),
+    ('vendor_bill_history', 'vendor_bills'),
+    ('debit_notes', 'debit_notes'),
+    ('material_requisitions', 'requisitions'),
+    ('material_requisition_lines', 'requisitions'),
+    ('material_requisition_history', 'requisitions'),
+    ('stock_ledger', 'stock_ledger'),
+    ('stock_adjustments', 'stock_adjustments'),
+    ('stock_adjustment_history', 'stock_adjustments')
+  ) AS v(t, c) LOOP
+    EXECUTE format('ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY', t);
+    EXECUTE format('REVOKE ALL ON public.%I FROM anon', t);
+    EXECUTE format('GRANT SELECT, INSERT, UPDATE, DELETE ON public.%I TO authenticated', t);
+    EXECUTE format('GRANT ALL ON public.%I TO service_role', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: read" ON public.%I', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: insert" ON public.%I', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: update" ON public.%I', t);
+    EXECUTE format('DROP POLICY IF EXISTS "ERP staff: delete" ON public.%I', t);
+    EXECUTE format('CREATE POLICY "ERP staff: read" ON public.%I FOR SELECT TO authenticated USING ((SELECT public.erp_can_read()))', t);
+    EXECUTE format('CREATE POLICY "ERP staff: insert" ON public.%I FOR INSERT TO authenticated WITH CHECK ((SELECT public.erp_can_write(%L)))', t, c);
+    EXECUTE format('CREATE POLICY "ERP staff: update" ON public.%I FOR UPDATE TO authenticated USING ((SELECT public.erp_can_write(%L))) WITH CHECK ((SELECT public.erp_can_write(%L)))', t, c, c);
+    EXECUTE format('CREATE POLICY "ERP staff: delete" ON public.%I FOR DELETE TO authenticated USING ((SELECT public.erp_can_delete(%L)))', t, c);
+    EXECUTE format('DROP TRIGGER IF EXISTS erp_touch ON public.%I', t);
+    EXECUTE format('CREATE TRIGGER erp_touch BEFORE UPDATE ON public.%I FOR EACH ROW EXECUTE FUNCTION public.erp_touch()', t);
+    EXECUTE format('ALTER TABLE public.%I REPLICA IDENTITY FULL', t);
+    IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime')
+       AND NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = t) THEN
+      EXECUTE format('ALTER PUBLICATION supabase_realtime ADD TABLE public.%I', t);
+    END IF;
+  END LOOP;
+END $sec$;
 
 -- Loads the sample data sent by the app ({table: rows[]}) in one transaction.
 -- Allowed on an empty database for any staff member, or for an administrator with wipe = true
