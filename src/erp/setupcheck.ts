@@ -25,11 +25,12 @@ export async function clientSetupChecks(): Promise<SetupCheck[]> {
   let host = "";
   if (url) {
     try {
-      host = new URL(url).host;
+      const parsed = new URL(url);
+      host = parsed.host;
       checks.push({
         name: "Backend address",
-        ok: host.endsWith(".supabase.co"),
-        detail: host.endsWith(".supabase.co")
+        ok: parsed.protocol === "https:" && host.endsWith(".supabase.co"),
+        detail: parsed.protocol === "https:" && host.endsWith(".supabase.co")
           ? "The backend address is well-formed."
           : "The backend address does not look like a Lovable Cloud database address. Reconnect Lovable Cloud.",
       });
@@ -40,13 +41,22 @@ export async function clientSetupChecks(): Promise<SetupCheck[]> {
 
   if (url && key) {
     try {
-      await supabase.auth.getSession();
-      checks.push({ name: "Sign-in service", ok: true, detail: "The sign-in service answered." });
+      const response = await fetch(`${url.replace(/\/$/, "")}/auth/v1/health`, {
+        headers: { apikey: key },
+        signal: AbortSignal.timeout(8000),
+      });
+      checks.push({
+        name: "Sign-in service",
+        ok: response.ok,
+        detail: response.ok
+          ? "The sign-in service answered."
+          : `The sign-in service answered with status ${response.status}. Check the Cloud connection settings.`,
+      });
     } catch (e: any) {
       checks.push({
         name: "Sign-in service",
         ok: false,
-        detail: `The sign-in service could not be reached (${e?.message || e}). The app will run in offline mode until this is fixed.`,
+        detail: `The sign-in service could not be reached (${e?.message || e}). Check the Cloud connection settings.`,
       });
     }
     try {
@@ -55,7 +65,9 @@ export async function clientSetupChecks(): Promise<SetupCheck[]> {
         name: "Data tables",
         ok: !error,
         detail: error
-          ? `The data tables could not be read (${error.message}). Access rules may be missing — ask the administrator to check the backend.`
+          ? error.code === "42501"
+            ? "This table is protected from visitors who have not signed in. Cloud is reachable; this is not a connection failure."
+            : `The data tables could not be read (${error.message}). Ask the administrator to check data access. This does not necessarily mean Cloud is offline.`
           : "The data tables answered a read request.",
       });
     } catch (e: any) {
@@ -82,5 +94,5 @@ export async function runSetupCheck(): Promise<SetupReport> {
 /** Quick yes/no used by the login page banner. */
 export async function connectionOk(): Promise<boolean> {
   const checks = await clientSetupChecks();
-  return checks.every((c) => c.ok);
+  return checks.filter((c) => c.name !== "Data tables").every((c) => c.ok);
 }
