@@ -196,6 +196,14 @@ a{color:var(--primary)}
 .kpi .k-foot{font-size:12.5px;color:var(--text-3)}
 .kpi.alert{border-left:4px solid var(--bad)}
 .kpi.warn{border-left:4px solid var(--warn)}
+.kpi-action{font:inherit;color:var(--text);text-align:left;cursor:pointer;width:100%;transition:border-color .15s,background .15s}
+.kpi-action:hover,.kpi-action:focus-visible{border-color:var(--primary);background:var(--surface-2)}
+.kpi-action:focus-visible,.hbar-action:focus-visible,.breakdown-row:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.breakdown-list{display:flex;flex-direction:column}
+.breakdown-row{display:flex;align-items:center;justify-content:space-between;gap:16px;width:100%;padding:14px 2px;text-align:left;background:transparent;border:0;border-bottom:1px solid var(--border);color:var(--text);font:inherit;cursor:pointer}
+.breakdown-row:last-child{border-bottom:0}.breakdown-row:hover{background:var(--surface-2)}
+.breakdown-row>span:first-child{display:flex;flex-direction:column;gap:4px;min-width:0}.breakdown-row .cell-sub{overflow-wrap:anywhere}
+.breakdown-end{display:flex;align-items:center;gap:12px;flex-shrink:0;color:var(--text-2)}
 .grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px;align-items:start}
 .grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px;align-items:start}
 
@@ -237,6 +245,8 @@ tr.clickable{cursor:pointer}
 .hbar .track{height:12px;background:var(--neutral-bg);border-radius:3px;overflow:hidden}
 .hbar .fill{height:100%;background:var(--primary);border-radius:3px}
 .hbar .val{font-size:12.5px;font-variant-numeric:tabular-nums;color:var(--text-2);min-width:70px;text-align:right}
+.hbar-action{width:100%;border:0;background:transparent;padding:5px 0;color:var(--text);font:inherit;text-align:left;cursor:pointer;border-radius:var(--radius)}
+.hbar-action:hover{background:var(--surface-2)}
 .stack{display:flex;height:16px;border-radius:4px;overflow:hidden;background:var(--neutral-bg)}
 .stack span{height:100%}
 .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:10px}
