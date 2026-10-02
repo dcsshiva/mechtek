@@ -8,11 +8,40 @@ import { TODAY, daysFrom, ds, inr, inrShort, qfmt } from "@/erp/format";
 import { canApprove, canEdit, canSee, isAdmin, me, myRole } from "@/erp/session";
 import { useErp } from "@/erp/store";
 import { go, routeName } from "@/erp/nav";
-import { PageHead, Pill, Stages } from "../ui";
+import { Modal, PageHead, Pill, Stages, closeModal, openModal } from "../ui";
 import { OrdersTable } from "./common";
 import { openLead } from "./Leads";
+import { OrderDetail } from "./Orders";
+import { QuoteDetail } from "./Quotes";
 
 type Att = [string, string, string, string];
+type BreakdownRow = { label: string; detail: string; value?: string; open: () => void };
+
+function breakdown(title: string, rows: BreakdownRow[]) {
+  openModal(
+    <Modal title={title} wide>
+      <div className="breakdown-list">
+        {rows.length ? rows.map((row, i) => (
+          <button key={i} type="button" className="breakdown-row" onClick={row.open}>
+            <span><strong>{row.label}</strong><span className="cell-sub">{row.detail}</span></span>
+            <span className="breakdown-end">{row.value && <strong>{row.value}</strong>}<span aria-hidden="true">→</span></span>
+          </button>
+        )) : <p className="empty">No matching records.</p>}
+      </div>
+    </Modal>,
+  );
+}
+
+function visit(route: string) { closeModal(); go(route); }
+function orderRow(o: any): BreakdownRow {
+  return { label: o.id, detail: `${custBy(o.cust).name} · ${o.lines.map((l: any) => `${l.qty} × ${fgBy[l.item].name}`).join(", ")}`, value: inrShort(orderValue(o)), open: () => openModal(<OrderDetail id={o.id} />) };
+}
+
+function DashboardKpi({ label, value, foot, tone = "", onClick }: { label: string; value: string | number; foot: string; tone?: string; onClick: () => void }) {
+  return <button type="button" className={`kpi kpi-action ${tone}`} onClick={onClick} aria-label={`${label}: ${value}. View details`}>
+    <span className="k-label">{label}</span><span className="k-value">{value}</span><span className="k-foot">{foot}</span>
+  </button>;
+}
 
 function crmAttention(att: Att[]) {
   if (canSee("crm"))
@@ -44,7 +73,10 @@ function ProdCard() {
               const st = woStages(w);
               const done = w.stage === st.length - 1;
               return (
-                <tr key={w.id} className="clickable" onClick={() => go("workorders")}>
+                <tr key={w.id} className="clickable" tabIndex={0} role="button" aria-label={`View work order ${w.id}`} onClick={() => breakdown(w.id, [
+                  { label: fgBy[w.item].name, detail: `${w.qty} units · ${done ? "Ready" : st[w.stage]} · Sales order ${w.so}`, open: () => canSee("orders") ? openModal(<OrderDetail id={w.so} />) : visit("workorders") },
+                  { label: "Work order progress", detail: st.join(" → "), open: () => visit("workorders") },
+                ])} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.currentTarget.click(); } }}>
                   <td><div className="cell-title mono">{w.id}</div><div className="cell-sub">{fgBy[w.item].name} × {w.qty}</div></td>
                   <td style={{ minWidth: 160 }}>
                     <Stages stages={st} stage={w.stage} style={{ minWidth: 0 }} />
@@ -124,6 +156,8 @@ export function DashboardPage() {
     GATES.filter((g: any) => g.returnable && ["Out, awaiting return", "Partly returned"].includes(g.status) && g.expBack && daysFrom(g.expBack) <= 3)
       .forEach((g: any) => att.push([`${g.id}: ${g.purpose} with ${venBy(g.party).name} due back ${ds(g.expBack)}`, "", "Gate pass", "gate"]));
   const ops = canSee("workorders") || canSee("mrp");
+  const quoteRows = (list: any[]): BreakdownRow[] => list.map((q: any) => ({ label: q.id, detail: `${custBy(q.cust).name} · ${q.status} · ${q.disc}% discount`, value: inrShort(quoteValue(q)), open: () => openModal(<QuoteDetail id={q.id} />) }));
+  const amcRows: BreakdownRow[] = amcDue.map((i: any) => ({ label: `${custBy(i.cust).name} · ${fgBy[i.item].name}`, detail: `${i.serial} · ${amcStatus(i).t} · Cover until ${ds(i.amcTo)}`, open: () => visit("service") }));
 
   return (
     <>
@@ -134,41 +168,41 @@ export function DashboardPage() {
         actions={canEdit("leads") ? [<button key="n" className="btn primary" onClick={openLead}>New lead</button>] : undefined}
       />
       <div className="kpis">
-        {canSee("leads") && <div className="kpi"><span className="k-label">Open lead pipeline</span><span className="k-value">{inrShort(pipe)}</span><span className="k-foot">{openLeads.length} leads at list price</span></div>}
-        {canSee("orders") && <div className="kpi"><span className="k-label">Open order book</span><span className="k-value">{inrShort(ooVal)}</span><span className="k-foot">{oo.length} sales orders</span></div>}
+        {canSee("leads") && <DashboardKpi label="Open lead pipeline" value={inrShort(pipe)} foot={`${openLeads.length} leads at list price`} onClick={() => breakdown("Open lead pipeline", openLeads.map((l: any) => ({ label: `${l.id} · ${custBy(l.cust).name}`, detail: `${fgBy[l.item].name} · ${l.stage}${l.follow ? ` · Follow up ${ds(l.follow)}` : ""}`, value: inrShort(leadValue(l)), open: () => visit("leads") })))} />}
+        {canSee("orders") && <DashboardKpi label="Open order book" value={inrShort(ooVal)} foot={`${oo.length} sales orders`} onClick={() => breakdown("Open order book", oo.map(orderRow))} />}
         {canSee("quotes") && (
-          <div className={`kpi ${pend.length ? "warn" : ""}`}><span className="k-label">Quotes awaiting approval</span><span className="k-value">{pend.length}</span><span className="k-foot">{inrShort(pend.reduce((s: number, q: any) => s + quoteValue(q), 0))} net value</span></div>
+          <DashboardKpi label="Quotes awaiting approval" value={pend.length} foot={`${inrShort(pend.reduce((s: number, q: any) => s + quoteValue(q), 0))} net value`} tone={pend.length ? "warn" : ""} onClick={() => breakdown("Quotes awaiting approval", quoteRows(pend))} />
         )}
         {ops ? (
           <>
-            <div className="kpi"><span className="k-label">Work orders in progress</span><span className="k-value">{wip}</span><span className="k-foot">{WOS.filter((w: any) => w.stage === 0).length} waiting to start</span></div>
-            <div className={`kpi ${shortItems.length ? "alert" : ""}`}><span className="k-label">Raw materials short</span><span className="k-value">{shortItems.length}</span><span className="k-foot">for open orders, after stock and POs</span></div>
-            <div className={`kpi ${amcDue.length ? "warn" : ""}`}><span className="k-label">AMC renewals to act on</span><span className="k-value">{amcDue.length}</span><span className="k-foot">due within 60 days or expired</span></div>
+            <DashboardKpi label="Work orders in progress" value={wip} foot={`${WOS.filter((w: any) => w.stage === 0).length} waiting to start`} onClick={() => breakdown("Work orders in progress", WOS.filter((w: any) => w.stage > 0 && w.stage < woStages(w).length - 1).map((w: any) => ({ label: `${w.id} · ${fgBy[w.item].name}`, detail: `${w.qty} units · ${woStages(w)[w.stage]} · Sales order ${w.so}`, open: () => canSee("workorders") ? visit("workorders") : canSee("orders") ? openModal(<OrderDetail id={w.so} />) : visit("dashboard") })))} />
+            <DashboardKpi label="Raw materials short" value={shortItems.length} foot="for open orders, after stock and POs" tone={shortItems.length ? "alert" : ""} onClick={() => breakdown("Raw materials short", shortItems.map((x: any) => ({ label: x.r.name, detail: `${x.r.code} · Needed ${qfmt(x.qty)} ${x.r.uom} · On hand ${qfmt(x.onHand)} · On order ${qfmt(x.onOrder)}`, value: `${qfmt(x.short)} ${x.r.uom} short`, open: () => visit(canSee("mrp") ? "mrp" : "inventory") })))} />
+            <DashboardKpi label="AMC renewals to act on" value={amcDue.length} foot="due within 60 days or expired" tone={amcDue.length ? "warn" : ""} onClick={() => breakdown("AMC renewals to act on", amcRows)} />
           </>
         ) : canSee("quotes") && !isAdmin() ? (
           <>
-            <div className={`kpi ${clar.length ? "alert" : ""}`}><span className="k-label">Need your clarification</span><span className="k-value">{clar.length}</span><span className="k-foot">quotes returned by Admin</span></div>
-            <div className="kpi"><span className="k-label">Approved, ready to send</span><span className="k-value">{appr.length}</span><span className="k-foot">send to the customer</span></div>
+            <DashboardKpi label="Need your clarification" value={clar.length} foot="quotes returned by Admin" tone={clar.length ? "alert" : ""} onClick={() => breakdown("Need your clarification", quoteRows(clar))} />
+            <DashboardKpi label="Approved, ready to send" value={appr.length} foot="send to the customer" onClick={() => breakdown("Approved, ready to send", quoteRows(appr))} />
           </>
         ) : canSee("service") ? (
           <>
-            <div className={`kpi ${amcDue.length ? "warn" : ""}`}><span className="k-label">AMC renewals to act on</span><span className="k-value">{amcDue.length}</span><span className="k-foot">due within 60 days or expired</span></div>
-            <div className="kpi"><span className="k-label">Open service tickets</span><span className="k-value">{TICKETS.filter((t: any) => t.status !== "Closed").length}</span><span className="k-foot">{INSTALLED.length} machines in the field</span></div>
+            <DashboardKpi label="AMC renewals to act on" value={amcDue.length} foot="due within 60 days or expired" tone={amcDue.length ? "warn" : ""} onClick={() => breakdown("AMC renewals to act on", amcRows)} />
+            <DashboardKpi label="Open service tickets" value={TICKETS.filter((t: any) => t.status !== "Closed").length} foot={`${INSTALLED.length} machines in the field`} onClick={() => breakdown("Open service tickets", TICKETS.filter((t: any) => t.status !== "Closed").map((t: any) => ({ label: `${t.id} · ${t.serial}`, detail: `${t.issue} · ${t.status}`, open: () => visit("service") })))} />
           </>
         ) : null}
       </div>
       <div className="grid-2">
         <div className="col-stack">
           {canSee("orders") && <section className="card">
-            <div className="card-head"><h2>Open order book by product family</h2><span className="small muted">Net of discount</span></div>
+            <div className="card-head"><h2>Open order book by product family</h2><button className="btn ghost sm" onClick={() => breakdown("Open order book", oo.map(orderRow))}>View orders</button></div>
             <div className="card-body">
               <div className="hbar-list">
                 {famRows.map(([f, v]) => (
-                  <div className="hbar" key={f}>
+                  <button type="button" className="hbar hbar-action" key={f} onClick={() => breakdown(`${f} · open orders`, oo.filter((o: any) => o.lines.some((l: any) => fgBy[l.item].family === f)).map(orderRow))}>
                     <span className="lbl" title={f}>{f}</span>
                     <div className="track"><div className="fill" style={{ width: `${((v / famMax) * 100).toFixed(1)}%` }} /></div>
                     <span className="val">{inrShort(v)}</span>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -181,7 +215,7 @@ export function DashboardPage() {
             <table className="data">
               <tbody>
                 {att.map((a, i) => (
-                  <tr key={i} className="clickable" onClick={() => go(a[3])}>
+                  <tr key={i} className="clickable" tabIndex={0} role="button" aria-label={`View ${a[2]}: ${a[0]}`} onClick={() => go(a[3])} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.currentTarget.click(); } }}>
                     <td><Pill t={a[1] === "bad" ? "Action" : a[1] === "warn" ? "Review" : a[1] === "info" ? "Info" : "Waiting"} c={a[1]} /></td>
                     <td>{a[0]}</td>
                     <td className="small muted nowrap hide-sm">{a[2]}</td>
