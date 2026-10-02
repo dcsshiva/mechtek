@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- ERP demo logins are linked to seeded staff IDs and role permissions; provision missing Auth users only through a verified staff administrator because public account creation would permit privilege escalation.

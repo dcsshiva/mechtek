@@ -84,11 +84,6 @@ export async function signIn(username: string, password: string): Promise<{ ok: 
   let r: any;
   try {
     r = await supabase.auth.signInWithPassword({ email, password });
-    if (r.error?.code === "invalid_credentials") {
-      // First use of this database: create the demo logins, then try again.
-      const setup = await setupDemoLogins().catch(() => null);
-      if (setup?.created) r = await supabase.auth.signInWithPassword({ email, password });
-    }
   } catch (e) {
     r = { error: e };
   }
@@ -104,6 +99,12 @@ export async function signIn(username: string, password: string): Promise<{ ok: 
     return { ok: false, error: x ? INACTIVE : "This login is not linked to anyone in the Staff master." };
   }
   AUTH.mode = "cloud";
+  if (x.role === "R01") {
+    // Only a signed-in administrator may provision missing demo accounts.
+    // Never reset an existing account's password during sign-in.
+    try { await setupDemoLogins(); }
+    catch (e) { console.warn("[MEK-SEL] some demo accounts could not be provisioned:", e); }
+  }
   return finish(x);
 }
 

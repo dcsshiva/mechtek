@@ -39,24 +39,29 @@ async function staffRows(sb: any): Promise<StaffRec[]> {
 const BAN = (active: boolean) => (active ? "none" : "876000h");
 
 /**
- * First run: create a login for every staff member, with the demo passwords.
- * Does nothing once any ERP login exists, so it cannot be used to reset a password.
+ * An administrator provisions only missing sample accounts. Existing passwords
+ * are never reset; failed password checks must not trigger account creation.
  */
-export const setupDemoLogins = createServerFn({ method: "POST" }).handler(async () => {
+export const setupDemoLogins = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+  // Check the caller using the user's own RLS-scoped connection before loading the privileged client.
+  const staffId = context.claims?.app_metadata?.staff_id;
+  const { data: caller, error: staffError } = await context.supabase.from("staff").select("role_id,active").eq("id", staffId || "").maybeSingle();
+  if (staffError) throw staffError;
+  const { data: permission, error: permissionError } = caller
+    ? await context.supabase.from("role_permissions").select("access").eq("role_id", caller.role_id || "").eq("module", "staff").maybeSingle()
+    : { data: null, error: null };
+  if (permissionError) throw permissionError;
+  if (!caller?.active || permission?.access !== "full") throw new Error("Only a staff administrator can provision demo accounts.");
   const sb = await admin();
-  if ((await listLogins(sb)).length) return { created: 0 };
+  const existing = await listLogins(sb);
   const seedPw = Object.fromEntries((SEED_STAFF as StaffRec[]).map((x) => [x.id, x.password]));
-  let staff: StaffRec[] = [];
-  try {
-    staff = await staffRows(sb);
-  } catch {
-    /* table not created yet: use the sample staff */
-  }
-  if (!staff.length) staff = SEED_STAFF as StaffRec[];
+  const staff = await staffRows(sb);
   let created = 0;
   for (const x of staff) {
     const password = x.password || seedPw[x.id];
-    if (!x.username || !password) continue;
+    if (!x.username || !password || existing.some((u) => u.email === loginEmail(x.username))) continue;
     const { error } = await sb.auth.admin.createUser({
       email: loginEmail(x.username),
       password,
@@ -64,8 +69,8 @@ export const setupDemoLogins = createServerFn({ method: "POST" }).handler(async 
       app_metadata: { staff_id: x.id },
       ban_duration: BAN(x.active !== false),
     });
-    if (error) console.error("[MEK-SEL] could not create login for", x.username, error.message);
-    else created++;
+    if (error) throw new Error(`Could not provision ${x.username}: ${error.message}`);
+    created++;
   }
   return { created };
 });
