@@ -11,7 +11,7 @@ export const Route = createFileRoute("/login")({
     await restoreSession();
     if (SESSION.user) throw redirect({ to: "/dashboard" });
   },
-  head: () => ({ meta: [{ title: "Sign in — Selvantra Technologies" }] }),
+  head: () => ({ meta: [{ title: "Sign in — Selvantra Technologies" }, { name: "description", content: "Sign in to the Mechtek operations workspace by Selvantra Technologies." }, { property: "og:title", content: "Sign in — Selvantra Technologies" }, { property: "og:description", content: "Sign in to the Mechtek operations workspace by Selvantra Technologies." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: LoginPage,
 });
 
