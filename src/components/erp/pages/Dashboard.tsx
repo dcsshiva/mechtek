@@ -134,8 +134,8 @@ export function DashboardPage() {
         actions={canEdit("leads") ? [<button key="n" className="btn primary" onClick={openLead}>New lead</button>] : undefined}
       />
       <div className="kpis">
-        <div className="kpi"><span className="k-label">Open lead pipeline</span><span className="k-value">{inrShort(pipe)}</span><span className="k-foot">{openLeads.length} leads at list price</span></div>
-        <div className="kpi"><span className="k-label">Open order book</span><span className="k-value">{inrShort(ooVal)}</span><span className="k-foot">{oo.length} sales orders</span></div>
+        {canSee("leads") && <div className="kpi"><span className="k-label">Open lead pipeline</span><span className="k-value">{inrShort(pipe)}</span><span className="k-foot">{openLeads.length} leads at list price</span></div>}
+        {canSee("orders") && <div className="kpi"><span className="k-label">Open order book</span><span className="k-value">{inrShort(ooVal)}</span><span className="k-foot">{oo.length} sales orders</span></div>}
         {canSee("quotes") && (
           <div className={`kpi ${pend.length ? "warn" : ""}`}><span className="k-label">Quotes awaiting approval</span><span className="k-value">{pend.length}</span><span className="k-foot">{inrShort(pend.reduce((s: number, q: any) => s + quoteValue(q), 0))} net value</span></div>
         )}
@@ -159,7 +159,7 @@ export function DashboardPage() {
       </div>
       <div className="grid-2">
         <div className="col-stack">
-          <section className="card">
+          {canSee("orders") && <section className="card">
             <div className="card-head"><h2>Open order book by product family</h2><span className="small muted">Net of discount</span></div>
             <div className="card-body">
               <div className="hbar-list">
@@ -172,7 +172,7 @@ export function DashboardPage() {
                 ))}
               </div>
             </div>
-          </section>
+          </section>}
           {ops && <ProdCard />}
         </div>
         <section className="card">

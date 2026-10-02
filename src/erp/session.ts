@@ -147,7 +147,7 @@ export const level = (k: string): Level =>
 export const canSee = (r: string) => level(r) !== "none";
 export const canEdit = (k: string) => level(k) === "full";
 export const canApprove = (t: string) => !!(myRole() && myRole().approvals && myRole().approvals[t]);
-export const isAdmin = () => !!(myRole() && myRole().approvals && myRole().approvals.quotes);
+export const isAdmin = () => canEdit("staff") && canEdit("roles");
 export const modName = (k: string) =>
   ((MODULES as any[]).flatMap((g) => g[1]).find((m: any) => m[0] === k) || [k, k])[1];
 
